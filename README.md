@@ -56,10 +56,8 @@ docker run \
         -v /opt/openhab/userdata:/openhab/userdata \
         -v /opt/openhab/addons:/openhab/addons\
         -d \
-        -e USER_ID=<uid> \
-        -e GROUP_ID=<gid> \
         --restart=always \
-        openhab/openhab:2.2.0-snapshot-amd64-debian
+        openhab/openhab:2.2.0-snapshot-armhf-debian
 ```
 
 Run the connector script:
@@ -68,8 +66,13 @@ python main.py
 ```
 
 # Mapping OpenHAB to IoT Repository
-* OpenHAB UID = Device ID
-* OpenHAB Label = Device name
+* OpenHAB thing = device 
+* OpenHAB item = service
+** but they are linked to things
+** have a unique id -> unique rest endpoint
+* OpenHAB UID = device ID
+* OpenHAB item link = service uri
+* OpenHAB thing and item label = device and service name
 
 # Notes
 * Version 2.2.0 is needed for Netatmo and Ikea Tradfri binding 

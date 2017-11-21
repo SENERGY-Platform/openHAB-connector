@@ -63,7 +63,7 @@ class Monitor(threading.Thread):
                 client.Client.add(formatted_device)
 
     def get_item(self,item):
-        response = requests.get("http://{ip}:{port}/rest/items{item}".format(ip=self.ip, port=self.port,item=item))
+        response = requests.get("http://{ip}:{port}/rest/items/{item}".format(ip=self.ip, port=self.port,item=item))
         return response.json()
         
     def get_things(self):
