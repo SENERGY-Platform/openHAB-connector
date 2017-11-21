@@ -1,0 +1,17 @@
+version: '2.1'
+
+services:
+  openhab:
+    image: "openhab/openhab:2.2.0-snapshot-amd64-debian"
+    restart: always
+    network_mode: host
+    tty: true
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+      - "/opt/openhab/addons:/openhab/addons"
+      - "/opt/openhab/conf:/openhab/conf"
+      - "/opt/openhab/userdata:/openhab/userdata"
+    environment:
+      OPENHAB_HTTP_PORT: "8080"
+      OPENHAB_HTTPS_PORT: "8443"
