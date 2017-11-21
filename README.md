@@ -33,10 +33,13 @@ chown -R openhab:openhab /opt/openhab
 ```
 
 Install the connector script:
+You will need Python3 and pip.
 ```shell
-virtualenv python3.4 --python=python3.4
-cd python3.4
+python3 -m virtualenv python3 --python=python3
+cd python3
 source bin/activate
+pip install requests
+pip install websockets
 git clone 
 ```
 
@@ -46,6 +49,7 @@ Run the docker container:
 docker run \
         --name openhab \
         --net=host \
+	--tty=true\
         -v /etc/localtime:/etc/localtime:ro \
         -v /etc/timezone:/etc/timezone:ro \
         -v /opt/openhab/conf:/openhab/conf \
