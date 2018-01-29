@@ -339,6 +339,20 @@ UpDownType	UP, DOWN
 
 # Notes
 * Version 2.2.0 wird benötigt ür netatmo
+* hauptunterschied zwischen SEPL und openhab:
+* SEPL definerit Deivce Types und Service Types
+* SEPL geht davon aus, dass Service URIs unabhängig von der Device Instanz sind
+* z.b service location bei Typ smartphone
+* jede geräte instanz verwendet location als service uri
+* service uri device type = service uri device instance
+
+* openhab definiert service uris abhängig von der device instanz
+* openhab definert aber auch device unabhängige service uri
+* da aber service uri bei device typ angegeben werden muss und nicht bei Device Erstellung, muss im Gateway irgendwie vom allgemeinen service uri auf die des geräts 
+
+# TODO
+- config file für urls, value type ids 
+- leerzeichen entfernen bei service name, service id ...
  
 
 

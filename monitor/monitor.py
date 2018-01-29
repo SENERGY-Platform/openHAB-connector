@@ -12,17 +12,15 @@ from api_manager import api_manager
 # todo: Yann connector client post device type support 
 
 class Monitor(threading.Thread):
-    def __init__(self, ip, port, iot_repo):
+    def __init__(self):
         super().__init__()
-        self.openhab_ip = ip 
-        self.openhab_port = port 
-        self.iot_repository = iot_repo
-        self.api_manager = api_manager.APIManager(self.openhab_ip, self.openhab_port)
+        self.openhab_api_manager = api_manager.OpenhabAPIManager()
+        self.platform_api_manager = api_manager.PlatformAPIManager()
 
     def run(self):
         while True:
             time.sleep(10)
-            unknown_devices = self.api_manager.get_things()
+            unknown_devices = self.openhab_api_manager.get_things()
             if unknown_devices:
                 self._evaluate(unknown_devices)
 
@@ -51,7 +49,7 @@ class Monitor(threading.Thread):
                 self.add_device(device)
     
     def get_device_type_json(self, device):
-        device_type_informations = self.api_manager.get_thing_type(device.get("thingTypeUID"))
+        device_type_informations = self.openhab_api_manager.get_thing_type(device.get("thingTypeUID"))
         
         # Object structure for IoT Repository
         device_type = {  
@@ -96,17 +94,14 @@ class Monitor(threading.Thread):
 
                         ],
                         "input":[  
-
-                        ],
-                        "output":[  
-                            {  
+                         {  
                             "type": {  
                                 "id": data_type_id_platform
                             },
                             "msg_segment":{  
                                 "id":"iot#88cd5b0e-a451-4070-a20d-464ee23742dd"
                             },
-                            "name":"Value Type",
+                            "name":"ValueType",
                             "format":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#json",
                             "additional_formatinfo":[  
                                 {  
@@ -117,6 +112,8 @@ class Monitor(threading.Thread):
                                 }
                             ]
                             }
+                        ],
+                        "output":[  
                         ],
                         "name": service.get("name"),
                         "description": service.get("desc"),
@@ -138,13 +135,13 @@ class Monitor(threading.Thread):
             self.create_type_on_platform(device_type_json_formatted)
 
         if device_type_patform_id:
+            print("New Device")
             formatted_device = self.format(device, device_type_patform_id)
             client.Client.add(formatted_device)
 
     def get_types_with_service(self, device_types, services, index):
         # Query all device types that have this one service
-        url = self.iot_repository + "/query/service"
-        response = requests.post(url, data=json.dumps(services[index])).json()
+        response = self.platform_api_manager.get_device_types_with_service(json.dumps(services[index]))
         if response:
             same_device_types = []
             if index == 0:
@@ -184,8 +181,7 @@ class Monitor(threading.Thread):
         if found_device_type_id:
             # check if keys from my generated device type have the same value as the one from the platform 
             #todo
-            url = self.iot_repository + "/deviceType/" + parse.quote_plus(found_device_type_id)
-            found_device_type_object = requests.get(url).json()
+            found_device_type_object = self.platform_api_manager.get_device_type(parse.quote_plus(found_device_type_id))
             # last check for general proerperties of device type like name 
             check_properties = ["name", "description"]
             for check in check_properties:
@@ -206,14 +202,13 @@ class Monitor(threading.Thread):
             "Location" : "iot#659baf31-64ec-44e9-85fc-2c154ba04976",
             "Switch": "iot#659baf31-64ec-44e9-85fc-2c154ba04976",
             "String": "iot#659baf31-64ec-44e9-85fc-2c154ba04976"
-
         }
 
         return type_map.get(item_type)
 
     def create_type_on_platform(self,device_type_json_formatted):
-        response = requests.post(self.iot_repository + "/deviceType",data=device_type_json_formatted)
-        device_type_id_on_platform = response.json().get("id")
+        response = self.platform_api_manager.create_type(device_type_json_formatted)
+        device_type_id_on_platform = response.get("id")
         return device_type_id_on_platform 
 
   
