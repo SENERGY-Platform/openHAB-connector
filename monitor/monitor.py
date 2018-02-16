@@ -24,20 +24,6 @@ class Monitor(threading.Thread):
             if unknown_devices:
                 self._evaluate(unknown_devices)
 
-    def _diff(self, known, unknown):
-        known_set = set(known.keys())
-        unknown_ids = list(map(lambda device: device.get("UID"), unknown))
-        unknown_set = set(unknown_ids)
-        missing = known_set - unknown_set
-        new = unknown_set - known_set
-        new = list(filter(lambda device: device.get("UID") in new, unknown))
-        return missing, new
-
-    def format(self,device,device_type_id_on_platform):
-        device_name = device.get("label")
-        device_id = device.get("UID")
-        return device_file.Device(device_id, device_type_id_on_platform, device_name)
-
     def _evaluate(self, unknown_devices):        
         missing_devices, new_devices = self._diff(device_pool.DevicePool.devices(), unknown_devices)
         if missing_devices:
@@ -47,6 +33,36 @@ class Monitor(threading.Thread):
         if new_devices:
             for device in new_devices:
                 self.add_device(device)
+
+    def _diff(self, known, unknown):
+        known_set = set(known.keys())
+        unknown_ids = list(map(lambda device: device.get("UID"), unknown))
+        unknown_set = set(unknown_ids)
+        missing = known_set - unknown_set
+        new = unknown_set - known_set
+        new = list(filter(lambda device: device.get("UID") in new, unknown))
+        return missing, new
+
+    def add_device(self,device):
+        device_type_json_formatted = self.get_device_type_json(device)
+        found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
+        print("device type found on platform? " + str(found_on_platform))
+
+        # if platform id exists then the device type was created already 
+        if not found_on_platform:
+            print("create new device type")
+            self.create_type_on_platform(device_type_json_formatted)
+
+        if device_type_patform_id:
+            print("device type ID: " + str(device_type_patform_id))
+            print("add new device")
+            formatted_device = self.format(device, device_type_patform_id)
+            client.Client.add(formatted_device)
+
+    def format(self,device,device_type_id_on_platform):
+        device_name = device.get("label")
+        device_id = device.get("UID")
+        return device_file.Device(device_id, device_type_id_on_platform, device_name)
     
     def get_device_type_json(self, device):
         device_type_informations = self.openhab_api_manager.get_thing_type(device.get("thingTypeUID"))
@@ -69,22 +85,30 @@ class Monitor(threading.Thread):
 
         data_types = {}
         for channel in device.get("channels"):
+            # Get platform data type with the device instance channel
+            # not possible to get data type from device type channel
             data_types[channel.get("channelTypeUID")] = {
                 "data_type": self.get_platform_data_type(channel.get("itemType"))
             }
 
         services = []
         for channel in device_type_informations.get("channels"):
-            services.append({
+            service = {
                 "name": channel.get("label", "no label"),
                 "desc": channel.get("description", "no description"),
-                "uri": channel.get("typeUID", "no uri")            
-            })
+                "uri": channel.get("typeUID", "no uri")          
+            }
+
+            data_type = data_types.get(service.get("uri"))
+            if data_type:
+                service["data_type_id_platform"] = data_type.get("data_type")
+
+            services.append(service)
 
         for service in services:        
-            # only if a data type was found, create the device type
-            data_type_id_platform = data_types.get(service.get("uri")).get("data_type")
-            if data_type_id_platform:
+            print(service)
+            # only if a matching data type was found the platform on , create the device type
+            if service.get("data_type_id_platform"):
                 device_type["services"].append(  
                     {  
                         "protocol":{  
@@ -96,13 +120,13 @@ class Monitor(threading.Thread):
                         "input":[  
                          {  
                             "type": {  
-                                "id": data_type_id_platform
+                                "id": service.get("data_type_id_platform")
                             },
                             "msg_segment":{  
                                 "id":"iot#88cd5b0e-a451-4070-a20d-464ee23742dd"
                             },
                             "name":"ValueType",
-                            "format":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#json",
+                            "format":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#PlainText",
                             "additional_formatinfo":[  
                                 {  
                                     "field":{  
@@ -123,21 +147,6 @@ class Monitor(threading.Thread):
                 )
 
         return json.dumps(device_type)
-
-
-    def add_device(self,device):
-        device_type_json_formatted = self.get_device_type_json(device)
-        found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
-        print(found_on_platform)
-        print(device_type_patform_id)
-        # if platform id exists then the device type was created already 
-        if not found_on_platform:
-            self.create_type_on_platform(device_type_json_formatted)
-
-        if device_type_patform_id:
-            print("New Device")
-            formatted_device = self.format(device, device_type_patform_id)
-            client.Client.add(formatted_device)
 
     def get_types_with_service(self, device_types, services, index):
         # Query all device types that have this one service
@@ -199,7 +208,7 @@ class Monitor(threading.Thread):
 
         type_map = {
             "Number": "iot#ae51bb9c-af3a-495a-aebf-c46469045e05",
-            "Location" : "iot#659baf31-64ec-44e9-85fc-2c154ba04976",
+            "Location": "iot#659baf31-64ec-44e9-85fc-2c154ba04976",
             "Switch": "iot#659baf31-64ec-44e9-85fc-2c154ba04976",
             "String": "iot#659baf31-64ec-44e9-85fc-2c154ba04976"
         }

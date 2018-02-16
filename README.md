@@ -350,9 +350,14 @@ UpDownType	UP, DOWN
 * openhab definert aber auch device unabhängige service uri
 * da aber service uri bei device typ angegeben werden muss und nicht bei Device Erstellung, muss im Gateway irgendwie vom allgemeinen service uri auf die des geräts 
 
+* services bei openhab sind auf device instanz
+* zztl. kann service aktiviert oder deaktiviert sein -> im UI muss channel explizit "gelinked" werden
+* in der Platform können dadurch Services vom Device Type angezeigt werden, welche nicht auf der Device Instanz ausgeführt werden können
+
 # TODO
 - config file für urls, value type ids 
 - leerzeichen entfernen bei service name, service id ...
  
 
 
+git clone --recurse-submodules

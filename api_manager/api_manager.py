@@ -1,10 +1,11 @@
 import requests 
-
-hab_ip = "openhabianpi"
-hab_port = 8080
-platform_ip = "fgseitsrancher.wifa.intern.uni-leipzig.de"
-platform_port = 8000
-iot_repo_path = "/iot-device-repo"
+import configparser
+import os
+dir = os.path.dirname(__file__)
+filename = os.path.join(dir, '../config.ini')
+config = configparser.ConfigParser()
+config.read(filename)
+print(config.sections())
 
 
 class APIManager():
@@ -13,18 +14,18 @@ class APIManager():
         self.port = port 
         self.base_path = base_path
     
-    def get(self, path):
-        response = requests.get("http://{ip}:{port}{base_path}{path}".format(ip=self.ip, port=self.port,base_path=self.base_path,path=path))
+    def get(self, path, headers=None):
+        response = requests.get("http://{ip}:{port}{base_path}{path}".format(ip=self.ip, port=self.port,base_path=self.base_path,path=path), headers=headers)
         return response.json()
 
-    def post(self,path,payload):
+    def post(self, path, payload, headers=None):
         url = "http://{ip}:{port}{base_path}{path}".format(ip=self.ip, port=self.port,base_path=self.base_path,path=path)
-        response = requests.post(url,data=payload)
-        return response.json()
+        response = requests.post(url,data=payload, headers=headers)
+        return response
 
 class OpenhabAPIManager(APIManager):
     def __init__(self):
-        super().__init__(hab_ip, hab_port)
+        super().__init__(config["OPENHAB"]["host"], config["OPENHAB"]["port"])
 
     def get_thing_type(self,type_id):
         return self.get("/rest/thing-types/{id}".format(id=type_id))
@@ -40,16 +41,31 @@ class OpenhabAPIManager(APIManager):
 
 class PlatformAPIManager(APIManager):
     def __init__(self):
-        super().__init__(platform_ip, platform_port, iot_repo_path)
+        super().__init__(config["PLATFORM"]["host"], config["PLATFORM"]["port"], config["PLATFORM"]["iot_repo_path"])
+        self.keycloak_manager = KeycloakAPIManager()
 
     def create_type(self,payload):
-        return self.post("/deviceType",payload)
+        return self.post("/deviceType", payload, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
 
     def get_device_type(self,id):
-        return self.get("/deviceType/{id}".format(id=id))
-
+        return self.get("/deviceType/{id}".format(id=id), {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()})
+    
     def get_device_types_with_service(self, services):
-        return self.post("/query/service", services)
+        return self.post("/query/service", services, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
+
+class KeycloakAPIManager(APIManager):
+    def __init__(self):
+        super().__init__(config["KEYCLOAK"]["host"], config["KEYCLOAK"]["port"])
+
+    def get_access_token(self):
+        payload = {
+            "grant_type": "password",
+            "username": config["KEYCLOAK"]["username"],
+            "password": config["KEYCLOAK"]["password"],
+            "client_id": config["KEYCLOAK"]["client_id"],
+            "client_secret": config["KEYCLOAK"]["client_secret"]
+        }
+        return self.post("/auth/realms/master/protocol/openid-connect/token", payload).json().get("access_token")
 
 class DeviceAPIManager():
     def get_item(self,item):
