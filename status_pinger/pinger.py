@@ -4,6 +4,13 @@ import threading
 from connector_client.modules import device_pool
 import time 
 from connector_client.connector import client
+import configparser
+import os 
+
+dir = os.path.dirname(__file__)
+filename = os.path.join(dir, '../config.ini')
+config = configparser.ConfigParser()
+config.read(filename)
 
 class Pinger(threading.Thread):
     def __init__(self):
@@ -13,7 +20,7 @@ class Pinger(threading.Thread):
 
     def run(self):
         while True:
-            time.sleep(10)
+            time.sleep(int(config["CONNECTOR"]["ping_interval"]))
             current_connected_devices = device_pool.DevicePool.devices().keys()
             if len(current_connected_devices) is not 0:
                 for device_id in current_connected_devices:
