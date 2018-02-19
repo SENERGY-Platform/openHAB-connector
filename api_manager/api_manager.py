@@ -5,8 +5,6 @@ dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
-print(config.sections())
-
 
 class APIManager():
     def __init__(self, ip, port, base_path=""):

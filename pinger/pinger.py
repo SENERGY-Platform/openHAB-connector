@@ -1,1 +1,0 @@
-# /things mit ids aus device ppool status checken 

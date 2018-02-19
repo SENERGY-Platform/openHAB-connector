@@ -354,6 +354,19 @@ UpDownType	UP, DOWN
 * zztl. kann service aktiviert oder deaktiviert sein -> im UI muss channel explizit "gelinked" werden
 * in der Platform können dadurch Services vom Device Type angezeigt werden, welche nicht auf der Device Instanz ausgeführt werden können
 
+
+* Openhab hat 1:n Beziehung bei Datentypen zu Service
+* Service hat zwar nur ein Item Type wie "Dimmer" aber der kann verschiedene Datentypen haben, z.b 50%, "ON"
+* SEPL hat 1:1 Beziehung bei Datentypen 
+
+# Pinger 
+- prüft, ob die Devices aus dem DevicePool (Memory Speicher) noch online sind
+- falls disconnected, wird das device aus dem DevicePool entfertn und auf der Platfor disconnected (Client.disconnect())
+- falls das Device wieder online ist, wird es wieder zur Platform hinzugefügt (Client.add()), geschieht auch, wenn das Gerät schon online ist, da im DevicePool nicht bekannt ist, ob das Device online oder offline ist 
+- Ping Intervall ist konfigurierbar 
+
+# Config
+
 # TODO
 - config file für urls, value type ids 
 - leerzeichen entfernen bei service name, service id ...

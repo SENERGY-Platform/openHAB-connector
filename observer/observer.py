@@ -22,7 +22,7 @@ class Observer(threading.Thread):
                 for channel in channels:
                     items = channel.get("linkedItems")
                     if len(items) != 0:
-                        service_response = self.openhab_api_manager.get(items[0])
+                        service_response = self.openhab_api_manager.get("/" + items[0])
                         service_response_value = service_response.get("state")
                         client.Client.event(device, channel.get("channelTypeUID"), service_response_value)
                     

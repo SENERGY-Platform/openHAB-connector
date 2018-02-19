@@ -8,6 +8,13 @@ from connector_client.modules import singleton
 from connector_client.modules import device_pool
 from connector_client.connector import client
 from api_manager import api_manager
+import configparser
+import os 
+
+dir = os.path.dirname(__file__)
+filename = os.path.join(dir, '../config.ini')
+config = configparser.ConfigParser()
+config.read(filename)
 
 # todo: Yann connector client post device type support 
 
@@ -19,18 +26,17 @@ class Monitor(threading.Thread):
 
     def run(self):
         while True:
-            time.sleep(10)
+            time.sleep(config["CONNECTOR"])
             unknown_devices = self.openhab_api_manager.get_things()
             if unknown_devices:
                 self._evaluate(unknown_devices)
 
-    def _evaluate(self, unknown_devices):        
+    def _evaluate(self, unknown_devices):   
         missing_devices, new_devices = self._diff(device_pool.DevicePool.devices(), unknown_devices)
         if missing_devices:
             for device in missing_devices:
                 client.Client.delete(device)
-        
-        if new_devices:
+        if new_devices: 
             for device in new_devices:
                 self.add_device(device)
 
@@ -53,11 +59,15 @@ class Monitor(threading.Thread):
             print("create new device type")
             self.create_type_on_platform(device_type_json_formatted)
 
-        if device_type_patform_id:
-            print("device type ID: " + str(device_type_patform_id))
-            print("add new device")
-            formatted_device = self.format(device, device_type_patform_id)
-            client.Client.add(formatted_device)
+        # device type id exists and device is online
+        status = device.get("statusInfo")
+        if status:
+            device_is_connected = status.get("status")
+            if device_type_patform_id and device_is_connected == "ONLINE":
+                print("device type ID: " + str(device_type_patform_id))
+                print("add new device")
+                formatted_device = self.format(device, device_type_patform_id)
+                client.Client.add(formatted_device)
 
     def format(self,device,device_type_id_on_platform):
         device_name = device.get("label")
@@ -106,7 +116,6 @@ class Monitor(threading.Thread):
             services.append(service)
 
         for service in services:        
-            print(service)
             # only if a matching data type was found the platform on , create the device type
             if service.get("data_type_id_platform"):
                 device_type["services"].append(  
