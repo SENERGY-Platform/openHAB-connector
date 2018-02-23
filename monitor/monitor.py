@@ -26,10 +26,13 @@ class Monitor(threading.Thread):
 
     def run(self):
         while True:
-            time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
-            unknown_devices = self.openhab_api_manager.get_things()
-            if unknown_devices:
-                self._evaluate(unknown_devices)
+            try:
+                time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
+                unknown_devices = self.openhab_api_manager.get_things()
+                if unknown_devices:
+                    self._evaluate(unknown_devices)
+            except Exception as e:
+                print(e)
 
     def _evaluate(self, unknown_devices):   
         missing_devices, new_devices = self._diff(device_pool.DevicePool.devices(), unknown_devices)
