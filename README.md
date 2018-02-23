@@ -367,6 +367,10 @@ UpDownType	UP, DOWN
 
 # Config
 
+# Auto Start
+/etc/rc.local
+
+
 # TODO
 - config file für urls, value type ids 
 - leerzeichen entfernen bei service name, service id ...
