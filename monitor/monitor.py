@@ -53,6 +53,7 @@ class Monitor(threading.Thread):
         return missing, new
 
     def add_device(self,device):
+        print("add_device()")
         device_type_json_formatted = self.get_device_type_json(device)
         found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
         print("device type found on platform? " + str(found_on_platform))
