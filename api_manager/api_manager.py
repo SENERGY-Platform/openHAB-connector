@@ -62,7 +62,9 @@ class KeycloakAPIManager(APIManager):
             "password": config["KEYCLOAK"]["password"],
             "client_id": config["KEYCLOAK"]["client_id"]
         }
-        return self.post("/auth/realms/master/protocol/openid-connect/token", payload).json().get("access_token")
+        response = self.post("/auth/realms/master/protocol/openid-connect/token", payload).json()
+        print(response)
+        return response.get("access_token")
 
 class DeviceAPIManager():
     def get_item(self,item):
