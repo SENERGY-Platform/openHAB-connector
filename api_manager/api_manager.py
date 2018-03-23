@@ -7,17 +7,18 @@ config = configparser.ConfigParser()
 config.read(filename)
 
 class APIManager():
-    def __init__(self, ip, port, base_path=""):
+    def __init__(self, ip, port, base_path="", scheme="http"):
         self.ip = ip 
         self.port = port 
         self.base_path = base_path
+        self.scheme = scheme 
     
     def get(self, path, headers=None):
-        response = requests.get("http://{ip}:{port}{base_path}{path}".format(ip=self.ip, port=self.port,base_path=self.base_path,path=path), headers=headers)
+        response = requests.get("{scheme}://{ip}:{port}{base_path}{path}".format(self.scheme=scheme,ip=self.ip, port=self.port,base_path=self.base_path,path=path), headers=headers)
         return response.json()
 
     def post(self, path, payload, headers=None):
-        url = "http://{ip}:{port}{base_path}{path}".format(ip=self.ip, port=self.port,base_path=self.base_path,path=path)
+        url = "{scheme}://{ip}:{port}{base_path}{path}".format(scheme=self.scheme,ip=self.ip, port=self.port,base_path=self.base_path,path=path)
         response = requests.post(url,data=payload, headers=headers)
         return response
 
@@ -53,7 +54,7 @@ class PlatformAPIManager(APIManager):
 
 class KeycloakAPIManager(APIManager):
     def __init__(self):
-        super().__init__(config["KEYCLOAK"]["host"], config["KEYCLOAK"]["port"])
+        super().__init__(config["KEYCLOAK"]["host"], config["KEYCLOAK"]["port"], "", config["KEYCLOAK"]["scheme"])
 
     def get_access_token(self):
         payload = {
