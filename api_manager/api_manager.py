@@ -14,7 +14,7 @@ class APIManager():
         self.scheme = scheme 
     
     def get(self, path, headers=None):
-        response = requests.get("{scheme}://{ip}:{port}{base_path}{path}".format(self.scheme=scheme,ip=self.ip, port=self.port,base_path=self.base_path,path=path), headers=headers)
+        response = requests.get("{scheme}://{ip}:{port}{base_path}{path}".format(scheme=self.scheme,ip=self.ip, port=self.port,base_path=self.base_path,path=path), headers=headers)
         return response.json()
 
     def post(self, path, payload, headers=None):
