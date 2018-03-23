@@ -321,6 +321,10 @@ UpDownType	UP, DOWN
 # Auto Start
 /etc/rc.local
 
+# Troubleshooting
+- if you miss a service, it could be that you have to activate (=link) the channel in openhab
+- some channels are not linked by default (missing dot)
+
 
 # TODO
 - config file für urls, value type ids 

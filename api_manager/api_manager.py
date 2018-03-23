@@ -61,7 +61,6 @@ class KeycloakAPIManager(APIManager):
             "username": config["KEYCLOAK"]["username"],
             "password": config["KEYCLOAK"]["password"],
             "client_id": config["KEYCLOAK"]["client_id"],
-            "client_secret": config["KEYCLOAK"]["client_secret"]
         }
         return self.post("/auth/realms/master/protocol/openid-connect/token", payload).json().get("access_token")
 
