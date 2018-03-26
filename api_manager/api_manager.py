@@ -40,7 +40,7 @@ class OpenhabAPIManager(APIManager):
 
 class PlatformAPIManager(APIManager):
     def __init__(self):
-        super().__init__(config["PLATFORM"]["host"], config["PLATFORM"]["port"], config["PLATFORM"]["iot_repo_path"])
+        super().__init__(config["PLATFORM"]["host"], config["PLATFORM"]["port"], config["PLATFORM"]["iot_repo_path"], config["PLATFORM"]["scheme"])
         self.keycloak_manager = KeycloakAPIManager()
 
     def create_type(self,payload):
