@@ -3,8 +3,8 @@ import_path = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspec
 if import_path not in sys.path:
     sys.path.insert(0, import_path)
 
-from connector import client
-from connector import modules
+from connector.client import Client
+from connector.modules import DevicePool
 from monitor import monitor
 from observer import observer
 from executer import executer
