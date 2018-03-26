@@ -230,6 +230,7 @@ class Monitor(threading.Thread):
 
     def create_type_on_platform(self,device_type_json_formatted):
         response = self.platform_api_manager.create_type(device_type_json_formatted)
+        print(response)
         device_type_id_on_platform = response.get("id")
         return device_type_id_on_platform 
 
