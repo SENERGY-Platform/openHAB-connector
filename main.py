@@ -6,6 +6,10 @@ from executer import executer
 from status_pinger import pinger 
 
 if __name__ == "__main__":
+    import_path = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0],"connector_client")))
+    if import_path not in sys.path:
+        sys.path.insert(0, import_path)
+
     connector_client = client.Client(device_manager=device_pool.DevicePool) 
     
     monitor_openhab = monitor.Monitor()
