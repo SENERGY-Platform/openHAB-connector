@@ -220,10 +220,10 @@ class Monitor(threading.Thread):
         """
 
         type_map = {
-            "Number": "iot#ae51bb9c-af3a-495a-aebf-c46469045e05",
-            "Location": "iot#659baf31-64ec-44e9-85fc-2c154ba04976",
-            "Switch": "iot#659baf31-64ec-44e9-85fc-2c154ba04976",
-            "String": "iot#659baf31-64ec-44e9-85fc-2c154ba04976"
+            "Number": config["PLATFORM"]["number_data_type"],
+            "Location": config["PLATFORM"]["string_data_type"],
+            "Switch": config["PLATFORM"]["string_data_type"],
+            "String": config["PLATFORM"]["string_data_type"]
         }
 
         return type_map.get(item_type)
