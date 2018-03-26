@@ -2,9 +2,9 @@ if __name__ == '__main__':
     exit('Please use "client.py"')
 
 try:
-    from modules.logger import root_logger
-    from modules.singleton import Singleton
-    from connector.message import Message
+    from connector_client.modules.logger import root_logger
+    from connector_client.modules.singleton import Singleton
+    from connector_client.connector.message import Message
 except ImportError as ex:
     exit("{} - {}".format(__name__, ex.msg))
 import functools, asyncio, concurrent.futures

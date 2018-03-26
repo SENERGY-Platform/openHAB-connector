@@ -5,7 +5,6 @@ from observer import observer
 from executer import executer
 from status_pinger import pinger 
 
-
 if __name__ == "__main__":
     connector_client = client.Client(device_manager=device_pool.DevicePool) 
     

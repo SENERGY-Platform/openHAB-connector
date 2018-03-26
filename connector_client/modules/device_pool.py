@@ -2,8 +2,8 @@ if __name__ == '__main__':
     exit('Please use "client.py"')
 
 try:
-    from modules.logger import root_logger
-    from connector.device import DeviceManagerInterface, Device, _isDevice
+    from connector_client.modules.logger import root_logger
+    from connector_client.connector.device import DeviceManagerInterface, Device, _isDevice
 except ImportError as ex:
     exit("{} - {}".format(__name__, ex.msg))
 

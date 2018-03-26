@@ -2,7 +2,7 @@ if __name__ == '__main__':
     exit('Please use "client.py"')
 
 try:
-    from connector.configuration import LOGGING_LEVEL, LOCAL_ROTATING_LOG, ROTATING_LOG_BACKUP_COUNT
+    from connector_client.connector.configuration import LOGGING_LEVEL, LOCAL_ROTATING_LOG, ROTATING_LOG_BACKUP_COUNT
 except ImportError as ex:
     exit("{} - {}".format(__name__, ex.msg))
 from logging.handlers import TimedRotatingFileHandler

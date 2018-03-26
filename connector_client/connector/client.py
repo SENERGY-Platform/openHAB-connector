@@ -2,14 +2,14 @@ if __name__ == '__main__':
     exit('Please use "client.py"')
 
 try:
-    from modules.logger import root_logger
-    from modules.singleton import Singleton
-    from modules.http_lib import Methods as http
-    from connector.configuration import CONNECTOR_USER, CONNECTOR_PASSWORD, CONNECTOR_HOST, CONNECTOR_PORT, CONNECTOR_GID, writeConf
-    from connector.session import SessionManager
-    from connector.websocket import Websocket
-    from connector.message import Message, marshalMsg, unmarshalMsg, getMangledAttr, setMangledAttr
-    from connector.device import DeviceManagerInterface, Device, _isDevice
+    from connector_client.modules.logger import root_logger
+    from connector_client.modules.singleton import Singleton
+    from connector_client.modules.http_lib import Methods as http
+    from connector_client.connector.configuration import CONNECTOR_USER, CONNECTOR_PASSWORD, CONNECTOR_HOST, CONNECTOR_PORT, CONNECTOR_GID, writeConf
+    from connector_client.connector.session import SessionManager
+    from connector_client.connector.websocket import Websocket
+    from connector_client.connector.message import Message, marshalMsg, unmarshalMsg, getMangledAttr, setMangledAttr
+    from connector_client.connector.device import DeviceManagerInterface, Device, _isDevice
 except ImportError as ex:
     exit("{} - {}".format(__name__, ex.msg))
 import functools, json, time, hashlib
