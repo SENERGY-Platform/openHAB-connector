@@ -5,6 +5,7 @@ import json
 from connector_client.modules import device_pool
 import requests
 from api_manager import api_manager
+import datetime
 
 class Observer(threading.Thread):
     def __init__(self):
@@ -24,6 +25,11 @@ class Observer(threading.Thread):
                     if len(items) != 0:
                         service_response = self.openhab_api_manager.get("/" + items[0])
                         service_response_value = service_response.get("state")
-                        client.Client.event(device, channel.get("channelTypeUID"), service_response_value)
+                        payload = {
+                            "value": service_response_value,
+                            "time": datetime.datetime.now().isoformat()
+                        }
+                        # channel type uid == service id
+                        client.Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
                     
          

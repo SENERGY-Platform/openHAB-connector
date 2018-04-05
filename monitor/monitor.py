@@ -61,7 +61,7 @@ class Monitor(threading.Thread):
         """
         Add a new device, regardless of its connection status
         """
-        
+        # TODO set status to connected/disconnected on device creation Yann?
         logger.info("try to add new device")
         device_type_json_formatted = self.get_device_type_json(device)
         found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
