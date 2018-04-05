@@ -66,7 +66,9 @@ class Monitor(threading.Thread):
         # if platform id exists then the device type was created already 
         if not found_on_platform:
             logger.info("create new device type")
-            self.create_type_on_platform(device_type_json_formatted)
+            device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
+
+        logger.info("device type: " + device_type_patform_id)
 
         # device type id exists and device is online
         status = device.get("statusInfo")
@@ -86,6 +88,8 @@ class Monitor(threading.Thread):
         return device_file.Device(device_id, device_type_id_on_platform, device_name)
     
     def get_device_type_json(self, device):
+        logger.info("generate device type in platform json format")
+        logger.info("get thing type from OpenHAB")
         device_type_informations = self.openhab_api_manager.get_thing_type(device.get("thingTypeUID"))
         
         # Object structure for IoT Repository
