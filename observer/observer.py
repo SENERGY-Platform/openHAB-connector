@@ -6,6 +6,8 @@ from connector_client.modules import device_pool
 import requests
 from api_manager import api_manager
 import datetime
+from connector_client.modules.logger import root_logger
+logger = root_logger.getChild(__name__)
 
 class Observer(threading.Thread):
     def __init__(self):
@@ -15,6 +17,7 @@ class Observer(threading.Thread):
     def run(self):
         while True:
             time.sleep(30)
+            logger.info("get values from devices and push to platform")
             connected_devices = device_pool.DevicePool.devices()
             for device in connected_devices:
                 device_json = self.openhab_api_manager.get_thing(device)
@@ -30,6 +33,8 @@ class Observer(threading.Thread):
                             "time": datetime.datetime.now().isoformat()
                         }
                         # channel type uid == service id
+                        logger.info("try to publish data from service: " + channel.get("channelTypeUID"))
                         client.Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
+                        logger.info("published data: " + json.dumps(payload))
                     
          
