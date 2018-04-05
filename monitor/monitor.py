@@ -10,6 +10,9 @@ from connector_client.connector import client
 from api_manager import api_manager
 import configparser
 import os 
+from connector_client.modules.logger import root_logger
+logger = root_logger.getChild(__name__)
+
 
 dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
@@ -32,14 +35,16 @@ class Monitor(threading.Thread):
                 if unknown_devices:
                     self._evaluate(unknown_devices)
             except Exception as e:
-                print(e)
+                logger.info(e)
 
     def _evaluate(self, unknown_devices):   
         missing_devices, new_devices = self._diff(device_pool.DevicePool.devices(), unknown_devices)
         if missing_devices:
+            logger.info(str(len(new_devices)) + " devices were deleted on OpenHAB")
             for device in missing_devices:
                 client.Client.delete(device)
         if new_devices: 
+            logger.info("Found " + str(len(new_devices)) + " new devices on OpenHAB")
             for device in new_devices:
                 self.add_device(device)
 
@@ -53,14 +58,14 @@ class Monitor(threading.Thread):
         return missing, new
 
     def add_device(self,device):
-        print("add_device()")
+        logger.info("try to add new device")
         device_type_json_formatted = self.get_device_type_json(device)
         found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
-        print("device type found on platform? " + str(found_on_platform))
+        logger.info("device type found on platform? " + str(found_on_platform))
 
         # if platform id exists then the device type was created already 
         if not found_on_platform:
-            print("create new device type")
+            logger.info("create new device type")
             self.create_type_on_platform(device_type_json_formatted)
 
         # device type id exists and device is online
@@ -68,10 +73,12 @@ class Monitor(threading.Thread):
         if status:
             device_is_connected = status.get("status")
             if device_type_patform_id and device_is_connected == "ONLINE":
-                print("device type ID: " + str(device_type_patform_id))
-                print("add new device")
+                logger.info("device is online")
                 formatted_device = self.format(device, device_type_patform_id)
                 client.Client.add(formatted_device)
+                logger.info("added new device")
+            else:
+                logger.info("device is offline")
 
     def format(self,device,device_type_id_on_platform):
         device_name = device.get("label")
@@ -230,7 +237,7 @@ class Monitor(threading.Thread):
 
     def create_type_on_platform(self,device_type_json_formatted):
         response = self.platform_api_manager.create_type(device_type_json_formatted)
-        print(response)
+        logger.info(response)
         device_type_id_on_platform = response.get("id")
         return device_type_id_on_platform 
 
