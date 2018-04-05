@@ -181,7 +181,7 @@ class Monitor(threading.Thread):
                 if len(response) != 0:
                     device_types.append(response)
 
-        if len(device_types != 0):
+        if len(device_types) != 0:
             device_type_exist_in_all = True
             checked_device_type = None
             for device_type in device_types[0]:
