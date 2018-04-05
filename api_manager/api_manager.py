@@ -17,7 +17,7 @@ class APIManager():
     
     def get(self, path, headers=None):
         response = requests.get("{scheme}://{ip}:{port}{base_path}{path}".format(scheme=self.scheme,ip=self.ip, port=self.port,base_path=self.base_path,path=path), headers=headers)
-        return response.json()
+        return response
 
     def post(self, path, payload, headers=None):
         url = "{scheme}://{ip}:{port}{base_path}{path}".format(scheme=self.scheme,ip=self.ip, port=self.port,base_path=self.base_path,path=path)
@@ -30,19 +30,19 @@ class OpenhabAPIManager(APIManager):
 
     def get_thing_type(self,type_id):
         logger.info("get thing type from OpenHAB")
-        return self.get("/rest/thing-types/{id}".format(id=type_id))
+        return self.get("/rest/thing-types/{id}".format(id=type_id)).json()
         
     def get_things(self):
         logger.info("get things from OpenHAB")
-        return self.get("/rest/things")
+        return self.get("/rest/things").json()
 
     def get_item(self,item):
         logger.info("get item from OpenHAB")
-        return self.get("/rest/items/{item}".format(item=item))
+        return self.get("/rest/items/{item}".format(item=item)).json()
 
     def get_thing(self, device_id):
         logger.info("get thing from OpenHAB")
-        return self.get("/rest/things/{device_id}".format(device_id=device_id))
+        return self.get("/rest/things/{device_id}".format(device_id=device_id)).json()
 
 class PlatformAPIManager(APIManager):
     def __init__(self):
@@ -55,7 +55,7 @@ class PlatformAPIManager(APIManager):
 
     def get_device_type(self,id):
         logger.info("get device type on platform")
-        return self.get("/deviceType/{id}".format(id=id), {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()})
+        return self.get("/deviceType/{id}".format(id=id), {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
     
     def get_device_types_with_service(self, services):
         logger.info("get device types with match to provided services")
