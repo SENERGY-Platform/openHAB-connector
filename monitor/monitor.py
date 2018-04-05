@@ -58,6 +58,10 @@ class Monitor(threading.Thread):
         return missing, new
 
     def add_device(self,device):
+        """
+        Add a new device, regardless of its connection status
+        """
+        
         logger.info("try to add new device")
         device_type_json_formatted = self.get_device_type_json(device)
         found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
@@ -68,18 +72,10 @@ class Monitor(threading.Thread):
             device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
 
         logger.info("device type: " + device_type_patform_id)
-
-        # device type id exists and device is online
-        status = device.get("statusInfo")
-        if status:
-            device_is_connected = status.get("status")
-            if device_type_patform_id and device_is_connected == "ONLINE":
-                logger.info("device is online")
-                formatted_device = self.format(device, device_type_patform_id)
-                client.Client.add(formatted_device)
-                logger.info("added new device")
-            else:
-                logger.info("device is offline")
+        if device_type_patform_id:
+            formatted_device = self.format(device, device_type_patform_id)
+            client.Client.add(formatted_device)
+            logger.info("added new device")
 
     def format(self,device,device_type_id_on_platform):
         device_name = device.get("label")
