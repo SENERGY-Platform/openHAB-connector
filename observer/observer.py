@@ -29,9 +29,9 @@ class Observer(threading.Thread):
                         service_response = self.openhab_api_manager.getItemState(items[0])
                         try:
                             service_response = float(service_response)
-                        except ValueError e:
+                        except ValueError as e:
                             pass
-                            
+
                         # TODO convert to string / float
                         payload = {
                             "value": service_response,
