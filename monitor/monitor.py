@@ -170,28 +170,26 @@ class Monitor(threading.Thread):
 
         return json.dumps(device_type)
 
-    def get_types_with_service(self, device_types, services, index):
+    def get_types_with_service(self, services):
         # Query all device types that have this one service
-        response = self.platform_api_manager.get_device_types_with_service(json.dumps(services[index]))
+        response = self.platform_api_manager.get_device_types_with_service(json.dumps(services[0]))
+        logger.info(response)
+        logger.info(self.platform_api_manager.get_device_types_with_service(json.dumps(services)))
         if response:
-            logger.info(response)
-            same_device_types = []
-            if index == 0:
-                same_device_types = response
-            else:
-                same_device_types = list(set(device_types) & set(response))
+            if len(response) != 0:
+                logger.info(response)
+                same_device_types = []
 
-            length_same_device_types = len(same_device_types) 
-            if length_same_device_types == 0:
-                # Nothing found
-                return False
-            elif length_same_device_types == 1:
-                # Only one result, no futher checks needed
-                return same_device_types[0]
-            else:
-                # More than one device type found -> more service checks
-                found_device_type = self.get_types_with_service(same_device_types, services, index + 1)
-                return found_device_type
+                for device_type in response:
+                    same_device_types = list(set(same_device_types) & set(response))
+
+                length_same_device_types = len(same_device_types) 
+                if length_same_device_types == 0:
+                    # Nothing found
+                    return False
+                elif length_same_device_types == 1:
+                    # Only one result, no futher checks needed
+                    return same_device_types[0]
         else:
             return False
 
@@ -208,7 +206,7 @@ class Monitor(threading.Thread):
             # Case: Device type with no services like Netatmo API -> is not important -> should not be on the platform
             return (True, found_device_type_id)
         else: 
-            found_device_type_id = self.get_types_with_service([], services, 0)
+            found_device_type_id = self.get_types_with_service(services)
             
         if found_device_type_id:
             # check if keys from my generated device type have the same value as the one from the platform 
