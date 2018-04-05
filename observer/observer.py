@@ -39,7 +39,7 @@ class Observer(threading.Thread):
                         }
                         # channel type uid == service id
                         logger.info("try to publish data from service: " + channel.get("channelTypeUID"))
-                        client.Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
+                        client.Client.event(device, channel.get("channelTypeUID"), payload)
                         logger.info("published data: " + json.dumps(payload))
                     
          
