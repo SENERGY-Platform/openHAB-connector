@@ -175,22 +175,23 @@ class Monitor(threading.Thread):
         device_types = []
         for service in services:
             response = self.platform_api_manager.get_device_types_with_service(json.dumps(service))
-            device_types.append(response[0])
+            if len(response) != 0:
+                device_types.append(response)
 
         logger.info(device_types)
-        
-        same_device_types = []
-        for device_type in device_types:
-            same_device_types = list(set(same_device_types) & set(device_type))
-
-        logger.info(same_device_types)
-        length_same_device_types = len(same_device_types) 
-        if length_same_device_types == 0:
-            # Nothing found
+        device_type_exist_in_all = True
+        checked_device_type = None
+        for device_type in device_types[0]:
+            checked_device_type = device_type
+            for device_type_list in device_types:
+                if checked_device_type not in device_type_list:
+                    device_type_exist_in_all = False
+                    break
+            
+        if device_type_exist_in_all:
+            return checked_device_type
+        else:
             return False
-        elif length_same_device_types == 1:
-            # Only one result, no futher checks needed
-            return same_device_types[0]
 
 
     def get_platform_id(self, device_type_json_formatted):
