@@ -5,6 +5,8 @@ dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
+from connector_client.modules.logger import root_logger
+logger = root_logger.getChild(__name__)
 
 class APIManager():
     def __init__(self, ip, port, base_path="", scheme="http"):
@@ -27,15 +29,19 @@ class OpenhabAPIManager(APIManager):
         super().__init__(config["OPENHAB"]["host"], config["OPENHAB"]["port"])
 
     def get_thing_type(self,type_id):
+        logger.info("get thing type from OpenHAB")
         return self.get("/rest/thing-types/{id}".format(id=type_id))
         
     def get_things(self):
+        logger.info("get things from OpenHAB")
         return self.get("/rest/things")
 
     def get_item(self,item):
+        logger.info("get item from OpenHAB")
         return self.get("/rest/items/{item}".format(item=item))
 
     def get_thing(self, device_id):
+        logger.info("get thing from OpenHAB")
         return self.get("/rest/things/{device_id}".format(device_id=device_id))
 
 class PlatformAPIManager(APIManager):
@@ -44,12 +50,15 @@ class PlatformAPIManager(APIManager):
         self.keycloak_manager = KeycloakAPIManager()
 
     def create_type(self,payload):
+        logger.info("create device type on platform")
         return self.post("/deviceType", payload, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
 
     def get_device_type(self,id):
+        logger.info("get device type on platform")
         return self.get("/deviceType/{id}".format(id=id), {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()})
     
     def get_device_types_with_service(self, services):
+        logger.info("get device types with match to provided services")
         return self.post("/query/service", services, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
 
 class KeycloakAPIManager(APIManager):

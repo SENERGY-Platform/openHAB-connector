@@ -65,7 +65,6 @@ class Monitor(threading.Thread):
 
         # if platform id exists then the device type was created already 
         if not found_on_platform:
-            logger.info("create new device type")
             device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
 
         logger.info("device type: " + device_type_patform_id)
@@ -89,7 +88,6 @@ class Monitor(threading.Thread):
     
     def get_device_type_json(self, device):
         logger.info("generate device type in platform json format")
-        logger.info("get thing type from OpenHAB")
         device_type_informations = self.openhab_api_manager.get_thing_type(device.get("thingTypeUID"))
         
         # Object structure for IoT Repository
@@ -201,12 +199,12 @@ class Monitor(threading.Thread):
         SPARQL query where the whole device type json structure is used to search a device type, is to slow.
         So I have to query all device types that have one service and iterate through all services until only one device type matches all.
         """
-
+        logger.info("check if device type exists already")
         device_type = json.loads(device_type_json_formatted)
         services = device_type.get("services", [])
         found_device_type_id = False
         if len(services) == 0:
-            # Case: Device type with no service like Netatmo API -> is not important -> should not be on the platform
+            # Case: Device type with no services like Netatmo API -> is not important -> should not be on the platform
             return (True, found_device_type_id)
         else: 
             found_device_type_id = self.get_types_with_service([], services, 0)
@@ -240,8 +238,9 @@ class Monitor(threading.Thread):
         return type_map.get(item_type)
 
     def create_type_on_platform(self,device_type_json_formatted):
+        logger.info("try to create new device type")
         response = self.platform_api_manager.create_type(device_type_json_formatted)
-        logger.info(response)
+        logger.info("created device type")
         device_type_id_on_platform = response.get("id")
         return device_type_id_on_platform 
 
