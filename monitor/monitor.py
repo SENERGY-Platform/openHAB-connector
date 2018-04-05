@@ -174,6 +174,7 @@ class Monitor(threading.Thread):
         # Query all device types that have this one service
         response = self.platform_api_manager.get_device_types_with_service(json.dumps(services[index]))
         if response:
+            logger.info(response)
             same_device_types = []
             if index == 0:
                 same_device_types = response
