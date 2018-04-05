@@ -71,7 +71,7 @@ class Monitor(threading.Thread):
         if not found_on_platform:
             device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
 
-        logger.info("device type: " + device_type_patform_id)
+        logger.info("device type: " + str(device_type_patform_id))
         if device_type_patform_id:
             formatted_device = self.format(device, device_type_patform_id)
             client.Client.add(formatted_device)
