@@ -181,18 +181,20 @@ class Monitor(threading.Thread):
                 if len(response) != 0:
                     device_types.append(response)
 
-        logger.info(device_types)
-        device_type_exist_in_all = True
-        checked_device_type = None
-        for device_type in device_types[0]:
-            checked_device_type = device_type
-            for device_type_list in device_types:
-                if checked_device_type not in device_type_list:
-                    device_type_exist_in_all = False
-                    break
-            
-        if device_type_exist_in_all:
-            return checked_device_type
+        if len(device_types != 0):
+            device_type_exist_in_all = True
+            checked_device_type = None
+            for device_type in device_types[0]:
+                checked_device_type = device_type
+                for device_type_list in device_types:
+                    if checked_device_type not in device_type_list:
+                        device_type_exist_in_all = False
+                        break
+                
+            if device_type_exist_in_all:
+                return checked_device_type
+            else:
+                return False
         else:
             return False
 
