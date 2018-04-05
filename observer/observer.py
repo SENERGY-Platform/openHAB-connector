@@ -27,10 +27,9 @@ class Observer(threading.Thread):
                     items = channel.get("linkedItems")
                     if len(items) != 0:
                         logger.info(items)
-                        service_response = self.openhab_api_manager.get("/" + items[0])
-                        service_response_value = service_response.get("state")
+                        service_response = self.openhab_api_manager.getItemState(items[0])
                         payload = {
-                            "value": service_response_value,
+                            "value": service_response,
                             "time": datetime.datetime.now().isoformat()
                         }
                         # channel type uid == service id

@@ -40,6 +40,10 @@ class OpenhabAPIManager(APIManager):
         logger.info("get item from OpenHAB")
         return self.get("/rest/items/{item}".format(item=item)).json()
 
+    def getItemState(self,item):
+        logger.info("get item state from OpenHAB")
+        return self.get("/rest/items/{item}/state".format(item=item)).text
+
     def get_thing(self, device_id):
         logger.info("get thing from OpenHAB")
         return self.get("/rest/things/{device_id}".format(device_id=device_id)).json()
