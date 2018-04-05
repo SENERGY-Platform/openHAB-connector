@@ -27,7 +27,8 @@ class Observer(threading.Thread):
                     items = channel.get("linkedItems")
                     if len(items) != 0:
                         logger.info(items)
-                        service_response = self.openhab_api_manager.getItemState(items[0])
+                        service_response = float(self.openhab_api_manager.getItemState(items[0]))
+                        # TODO convert to string / float
                         payload = {
                             "value": service_response,
                             "time": datetime.datetime.now().isoformat()
