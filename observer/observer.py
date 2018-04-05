@@ -26,8 +26,12 @@ class Observer(threading.Thread):
                 for channel in channels:
                     items = channel.get("linkedItems")
                     if len(items) != 0:
-                        logger.info(items)
-                        service_response = float(self.openhab_api_manager.getItemState(items[0]))
+                        service_response = self.openhab_api_manager.getItemState(items[0])
+                        try:
+                            service_response = float(service_response)
+                        except ValueError e:
+                            pass
+                            
                         # TODO convert to string / float
                         payload = {
                             "value": service_response,
