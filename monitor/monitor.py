@@ -175,8 +175,10 @@ class Monitor(threading.Thread):
         device_types = []
         for service in services:
             response = self.platform_api_manager.get_device_types_with_service(json.dumps(service))
-            if len(response) != 0:
-                device_types.append(response)
+            logger.info(response)
+            if response:
+                if len(response) != 0:
+                    device_types.append(response)
 
         logger.info(device_types)
         device_type_exist_in_all = True
