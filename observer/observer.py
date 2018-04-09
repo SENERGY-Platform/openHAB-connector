@@ -7,6 +7,12 @@ from api_manager import api_manager
 import datetime
 from connector_client.modules.logger import root_logger
 logger = root_logger.getChild(__name__)
+import configparser
+import os
+dir = os.path.dirname(__file__)
+filename = os.path.join(dir, '../config.ini')
+config = configparser.ConfigParser()
+config.read(filename)
 
 class Observer(threading.Thread):
     def __init__(self):
@@ -15,7 +21,7 @@ class Observer(threading.Thread):
     
     def run(self):
         while True:
-            time.sleep(30)
+            time.sleep(config["CONNECTOR"]["ping_interval"])
             logger.info("get values from devices and push to platform")
             connected_devices = device_pool.DevicePool.devices()
             for device in connected_devices:
