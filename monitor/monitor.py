@@ -139,7 +139,7 @@ class Monitor(threading.Thread):
                         "config_parameter":[  
 
                         ],
-                        "input":[  
+                        "output":[
                          {  
                             "type": {  
                                 "id": service.get("data_type_id_platform")
@@ -159,7 +159,7 @@ class Monitor(threading.Thread):
                             ]
                             }
                         ],
-                        "output":[  
+                        "input":[
                         ],
                         "name": service.get("name"),
                         "description": service.get("desc"),
