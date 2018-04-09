@@ -21,6 +21,7 @@ class Observer(threading.Thread):
     
     def run(self):
         while True:
+            logger.info("Start observing of values")
             time.sleep(int(config["CONNECTOR"]["ping_interval"]))
             logger.info("get values from devices and push to platform")
             connected_devices = device_pool.DevicePool.devices()

@@ -38,6 +38,15 @@ client_id = openhabconnector
 
 ```
 
+# Value Type Generation
+OpenHAB connector wraps the the values from openHAB in a JSON format.  
+{
+"value": 20.0,
+"time": "2018-2-2"
+}
+
+Because it always JSON, we can generate the needed ValueTypes automatically 
+
 # Run
 Run the connector script:
 ```shell
