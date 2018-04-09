@@ -9,6 +9,35 @@ pip3 install requests
 pip3 install websockets 
 ```
 
+## Config files 
+```
+[OPENHAB]
+host = openhabianpi
+port = 8080
+
+[PLATFORM]
+scheme = https
+host = api.sepl.infai.org
+port = 8000
+iot_repo_path = /iot-device-repo
+number_data_type = iot#2c0f1265-8612-4c57-8bee-894acab7dad2
+string_data_type = iot#ae079227-8507-4314-92b6-e1b7eba0a765
+
+[CONNECTOR] 
+ping_interval = 10
+openhab_monitor_interval = 10
+
+[KEYCLOAK]
+scheme = https
+host = auth.sepl.infai.org
+port = 443
+username = username
+password = password
+client_id = openhabconnector
+
+
+```
+
 # Run
 Run the connector script:
 ```shell
