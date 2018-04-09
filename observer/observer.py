@@ -3,7 +3,6 @@ import time
 from connector_client.connector import device, client
 import json
 from connector_client.modules import device_pool
-import requests
 from api_manager import api_manager
 import datetime
 from connector_client.modules.logger import root_logger
@@ -41,5 +40,3 @@ class Observer(threading.Thread):
                         logger.info("try to publish data from service: " + channel.get("channelTypeUID"))
                         client.Client.event(device, channel.get("channelTypeUID"), payload)
                         logger.info("published data: " + json.dumps(payload))
-                    
-         

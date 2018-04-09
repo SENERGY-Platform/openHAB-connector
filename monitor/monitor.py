@@ -62,6 +62,7 @@ class Monitor(threading.Thread):
         Add a new device, regardless of its connection status
         """
         # TODO set status to connected/disconnected on device creation Yann?
+
         logger.info("try to add new device")
         device_type_json_formatted = self.get_device_type_json(device)
         found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
@@ -166,63 +167,58 @@ class Monitor(threading.Thread):
 
         return json.dumps(device_type)
 
-    def get_types_with_service(self, services):
+    def get_types_with_service(self, device_types, services, index):
         # Query all device types that have this one service
-        device_types = []
-        for service in services:
-            response = self.platform_api_manager.get_device_types_with_service(json.dumps(service))
-            logger.info(json.dumps(service))
-            
-            if response:
-                if len(response) != 0:
-                    device_types.append(response)
-
-        if len(device_types) != 0:
-            device_type_exist_in_all = True
-            checked_device_type = None
-            for device_type in device_types[0]:
-                checked_device_type = device_type
-                for device_type_list in device_types:
-                    if checked_device_type not in device_type_list:
-                        device_type_exist_in_all = False
-                        break
-                
-            if device_type_exist_in_all:
-                return checked_device_type
+        response = self.platform_api_manager.get_device_types_with_service(json.dumps(services[index]))
+        if response:
+            same_device_types = []
+            if index == 0:
+                same_device_types = response
             else:
+                same_device_types = list(set(device_types) & set(response))
+
+            length_same_device_types = len(same_device_types)
+            if length_same_device_types == 0:
+                # Nothing found
                 return False
+            elif length_same_device_types == 1:
+                # Only one result, no futher checks needed
+                return same_device_types[0]
+            else:
+                # More than one device type found -> more service checks
+                found_device_type = self.get_types_with_service(same_device_types, services, index + 1)
+                return found_device_type
         else:
             return False
-
 
     def get_platform_id(self, device_type_json_formatted):
         """
         SPARQL query where the whole device type json structure is used to search a device type, is to slow.
         So I have to query all device types that have one service and iterate through all services until only one device type matches all.
         """
-        logger.info("check if device type exists already")
+
         device_type = json.loads(device_type_json_formatted)
         services = device_type.get("services", [])
         found_device_type_id = False
         if len(services) == 0:
-            # Case: Device type with no services like Netatmo API -> is not important -> should not be on the platform
+            # Case: Device type with no service like Netatmo API -> is not important -> should not be on the platform
             return (True, found_device_type_id)
-        else: 
-            found_device_type_id = self.get_types_with_service(services)
-            
+        else:
+            found_device_type_id = self.get_types_with_service([], services, 0)
+
         if found_device_type_id:
-            # check if keys from my generated device type have the same value as the one from the platform 
-            #todo
+            # check if keys from my generated device type have the same value as the one from the platform
+            # todo
             found_device_type_object = self.platform_api_manager.get_device_type(parse.quote_plus(found_device_type_id))
-            # last check for general proerperties of device type like name 
+            # last check for general proerperties of device type like name
             check_properties = ["name", "description"]
             for check in check_properties:
                 if found_device_type_object.get(check) != device_type.get(check):
                     return (False, found_device_type_id)
-            
+
             return (True, found_device_type_id)
         else:
-            return (False,found_device_type_id)
+            return (False, found_device_type_id)
 
     def get_platform_data_type(self, item_type):
         """
