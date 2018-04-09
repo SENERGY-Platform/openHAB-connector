@@ -1,5 +1,8 @@
 config.ini
 connector.conf
+connector_client/logs/
+grep
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
