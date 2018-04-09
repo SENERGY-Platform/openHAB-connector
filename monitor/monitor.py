@@ -63,20 +63,23 @@ class Monitor(threading.Thread):
         """
         # TODO set status to connected/disconnected on device creation Yann?
 
-        logger.info("try to add new device")
-        device_type_json_formatted = self.get_device_type_json(device)
-        found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
-        logger.info("device type found on platform? " + str(found_on_platform))
+        status = device.get("statusInfo")
+        if status:
+            if status.get("status") == "ONLINE":
+                logger.info("try to add new device")
+                device_type_json_formatted = self.get_device_type_json(device)
+                found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
+                logger.info("device type found on platform? " + str(found_on_platform))
 
-        # if platform id exists then the device type was created already 
-        if not found_on_platform:
-            device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
+                # if platform id exists then the device type was created already
+                if not found_on_platform:
+                    device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
 
-        logger.info("device type: " + str(device_type_patform_id))
-        if device_type_patform_id:
-            formatted_device = self.format(device, device_type_patform_id)
-            client.Client.add(formatted_device)
-            logger.info("added new device")
+                logger.info("device type: " + str(device_type_patform_id))
+                if device_type_patform_id:
+                    formatted_device = self.format(device, device_type_patform_id)
+                    client.Client.add(formatted_device)
+                    logger.info("added new device")
 
     def format(self,device,device_type_id_on_platform):
         device_name = device.get("label")
