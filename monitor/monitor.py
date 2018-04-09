@@ -145,7 +145,7 @@ class Monitor(threading.Thread):
                                 "id":"iot#88cd5b0e-a451-4070-a20d-464ee23742dd"
                             },
                             "name":"ValueType",
-                            "format":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#PlainText",
+                            "format":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#json",
                             "additional_formatinfo":[  
                                 {  
                                     "field":{  
