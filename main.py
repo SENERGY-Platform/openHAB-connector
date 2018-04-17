@@ -4,8 +4,10 @@ from monitor import monitor
 from observer import observer
 from executer import executer
 from status_pinger import pinger 
+import logging
 
 if __name__ == "__main__":
+    logging.getLogger("urllib3").setLevel(logging.WARNING)
     connector_client = client.Client(device_manager=device_pool.DevicePool) 
     
     monitor_openhab = monitor.Monitor()
