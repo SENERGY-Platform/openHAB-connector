@@ -5,7 +5,7 @@ dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
-from connector_client.modules.logger import root_logger
+from modules.logger import root_logger
 logger = root_logger.getChild(__name__)
 
 class APIManager():

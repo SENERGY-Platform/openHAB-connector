@@ -3,14 +3,14 @@ import requests
 import time 
 import json 
 from urllib import parse
-from connector_client.connector import device as device_file
-from connector_client.modules import singleton
-from connector_client.modules import device_pool
-from connector_client.connector import client
+from connector import device as device_file
+from modules import singleton
+from modules import device_pool
+from connector import client
 from api_manager import api_manager
 import configparser
 import os 
-from connector_client.modules.logger import root_logger
+from modules.logger import root_logger
 logger = root_logger.getChild(__name__)
 
 

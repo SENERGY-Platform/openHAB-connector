@@ -1,9 +1,9 @@
 # /things mit ids aus device ppool status checken 
 from api_manager import api_manager
 import threading
-from connector_client.modules import device_pool
+from modules import device_pool
 import time 
-from connector_client.connector import client
+from connector import client
 import configparser
 import os 
 

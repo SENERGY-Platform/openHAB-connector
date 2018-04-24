@@ -1,5 +1,5 @@
 import threading
-from connector_client.connector import client
+from connector import client
 from api_manager import api_manager
 import requests
 
