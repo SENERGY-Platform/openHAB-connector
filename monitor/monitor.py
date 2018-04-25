@@ -32,6 +32,7 @@ class Monitor(threading.Thread):
         while True:
             time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
             unknown_devices = self.openhab_api_manager.get_things()
+            print(unknown_devices)
             if unknown_devices:
                 self._evaluate(unknown_devices)
         
