@@ -18,7 +18,7 @@ port = 8080
 [PLATFORM]
 scheme = https
 host = api.sepl.infai.org
-port = 8000
+port = 443
 iot_repo_path = /iot-device-repo
 number_data_type = iot#2c0f1265-8612-4c57-8bee-894acab7dad2
 string_data_type = iot#ae079227-8507-4314-92b6-e1b7eba0a765
@@ -33,7 +33,7 @@ host = auth.sepl.infai.org
 port = 443
 username = username
 password = password
-client_id = openhabconnector
+client_id = client_id
 
 
 ```
@@ -365,10 +365,6 @@ UpDownType	UP, DOWN
 
 
 # TODO
-- config file für urls, value type ids 
 - leerzeichen entfernen bei service name, service id ...
- 
-
-
-git clone --recurse-submodules
-
+- nur sensoren observen nicht alles geräte 
+- neuen datatype für nur string und decimal für aktuatoren

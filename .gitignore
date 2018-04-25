@@ -1,6 +1,6 @@
 config.ini
 connector.conf
-connector_client/logs/
+connector-client/
 grep
 
 # Byte-compiled / optimized / DLL files

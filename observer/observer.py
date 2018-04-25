@@ -20,32 +20,32 @@ class Observer(threading.Thread):
         self.openhab_api_manager = api_manager.OpenhabAPIManager()
     
     def run(self):
+        logger.info("Start observing of values")
         while True:
-            logger.info("Start observing of values")
             time.sleep(int(config["CONNECTOR"]["ping_interval"]))
             logger.info("get values from devices and push to platform")
             connected_devices = device_pool.DevicePool.devices()
-            for device in connected_devices:
-                device_json = self.openhab_api_manager.get_thing(device)
+            try:
+                for device in connected_devices:
+                    device_json = self.openhab_api_manager.get_thing(device)
 
-                channels = device_json.get("channels")
-                for channel in channels:
-                    items = channel.get("linkedItems")
-                    if items:
-                        if len(items) != 0:
-                            service_response = self.openhab_api_manager.getItemState(items[0])
-                            try:
+                    channels = device_json.get("channels")
+                    for channel in channels:
+                        items = channel.get("linkedItems")
+                        if items:
+                            if len(items) != 0:
+                                service_response = self.openhab_api_manager.getItemState(items[0])
                                 service_response = float(service_response)
-                            except ValueError as e:
-                                pass
 
-                            # TODO convert to string / float
-                            payload = {
-                                "value": service_response,
-                                "time": datetime.datetime.now().isoformat()
-                            }
-                            # channel type uid == service id
-                            logger.info("try to publish data from service: " + channel.get("channelTypeUID"))
-                            logger.info("publish data: " + json.dumps(payload))
-                            response = client.Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
-                            logger.info(response.status)
+                                # TODO convert to string / float
+                                payload = {
+                                    "value": service_response,
+                                    "time": datetime.datetime.now().isoformat()
+                                }
+                                # channel type uid == service id
+                                logger.info("try to publish data from service: " + channel.get("channelTypeUID"))
+                                logger.info("publish data: " + json.dumps(payload))
+                                response = client.Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
+                                logger.info(response.status)
+            except Exception as e:
+                logger.info(e)
