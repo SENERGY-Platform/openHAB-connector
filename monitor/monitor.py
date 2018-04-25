@@ -28,6 +28,7 @@ class Monitor(threading.Thread):
         self.platform_api_manager = api_manager.PlatformAPIManager()
 
     def run(self):
+        logger.info("start monitoring openhab")
         while True:
             time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
             unknown_devices = self.openhab_api_manager.get_things()
