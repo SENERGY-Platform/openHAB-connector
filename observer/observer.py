@@ -5,10 +5,15 @@ import json
 from modules import device_pool
 from api_manager import api_manager
 import datetime
-from modules.logger import root_logger
-logger = root_logger.getChild(__name__)
 import configparser
 import os
+import logging
+from modules.logger import connector_client_log_handler
+
+logger = logging.getLogger("openhab_logger")
+logger.setLevel(logging.DEBUG) 
+logger.addHandler(connector_client_log_handler)
+
 dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()

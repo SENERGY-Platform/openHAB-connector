@@ -6,11 +6,18 @@ import time
 from connector import client
 import configparser
 import os 
+import logging
+from modules.logger import connector_client_log_handler
+
 
 dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
+
+logger = logging.getLogger("openhab_logger")
+logger.setLevel(logging.DEBUG) 
+logger.addHandler(connector_client_log_handler)
 
 class Pinger(threading.Thread):
     def __init__(self):

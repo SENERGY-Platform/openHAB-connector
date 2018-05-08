@@ -5,8 +5,12 @@ dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
-from modules.logger import root_logger
-logger = root_logger.getChild(__name__)
+import logging
+from modules.logger import connector_client_log_handler
+
+logger = logging.getLogger("openhab_logger")
+logger.setLevel(logging.DEBUG) 
+logger.addHandler(connector_client_log_handler)
 
 class APIManager():
     def __init__(self, ip, port, base_path="", scheme="http"):

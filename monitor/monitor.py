@@ -10,8 +10,12 @@ from connector import client
 from api_manager import api_manager
 import configparser
 import os 
-from modules.logger import root_logger
-logger = root_logger.getChild(__name__)
+import logging
+from modules.logger import connector_client_log_handler
+
+logger = logging.getLogger("openhab_logger")
+logger.setLevel(logging.DEBUG) 
+logger.addHandler(connector_client_log_handler)
 
 
 dir = os.path.dirname(__file__)
@@ -131,6 +135,7 @@ class Monitor(threading.Thread):
         for service in services:        
             # only if a matching data type was found the platform on , create the device type
             if service.get("data_type_id_platform"):
+                # TODO if stateDescription.readOnly -> Sensorwert
                 device_type["services"].append(  
                     {  
                         "protocol":{  

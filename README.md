@@ -325,6 +325,9 @@ UpDownType	UP, DOWN
 * aber auf platform seite ist nur ein Data Type pro Service möglich 
 * -> problem z.b. bei service mit farben -> kann OnOff, IncreaseDecrease, Percent und HSB erhalten -> aber nur einer möglich
 * -> Lösung: Color Data Typ als JSON mit Properties OnOff, IncreaseDecrease,...
+* unterscheiden zwischen Input und Outputwerten
+* Outout -> wenn Item stateDescription.readOnly true -> dann value und time an Platform senden String_time
+* Input -> wenn Item stateDescription.readOnly false -> dann nur String oder Number
 
 # Notes
 * Version 2.2.0 wird benötigt ür netatmo
@@ -362,6 +365,8 @@ UpDownType	UP, DOWN
 # Troubleshooting
 - if you miss a service, it could be that you have to activate (=link) the channel in openhab
 - some channels are not linked by default (missing dot)
+
+- if the value type ids have changed, you have to change them in the config.ini file
 
 
 # TODO

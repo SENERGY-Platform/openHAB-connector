@@ -2,6 +2,12 @@ import threading
 from connector import client
 from api_manager import api_manager
 import requests
+import logging
+from modules.logger import connector_client_log_handler
+
+logger = logging.getLogger("openhab_logger")
+logger.setLevel(logging.DEBUG) 
+logger.addHandler(connector_client_log_handler)
 
 class Executer(threading.Thread):
     def __init__(self):
