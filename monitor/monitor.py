@@ -141,9 +141,9 @@ class Monitor(threading.Thread):
                         "protocol":{  
                             "id":"iot#d6a462c5-d4e0-4396-b3f3-28cd37b647a8"
                         },
-                        "config_parameter":[  
-
-                        ],
+                        "device_class": {
+                            "id": "iot#4bbe9a8d-de29-4073-8788-c0329472252b"
+                        },
                         "output":[
                          {  
                             "type": {  
@@ -164,8 +164,9 @@ class Monitor(threading.Thread):
                             ]
                             }
                         ],
-                        "input":[
-                        ],
+                        "vendor": {
+                            "id": "iot#8f69bd7e-91a2-4949-b69d-477012b45574"
+                        },
                         "name": service.get("name"),
                         "description": service.get("desc"),
                         "service_type":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#Sensor",
