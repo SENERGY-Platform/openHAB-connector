@@ -35,7 +35,9 @@ class Monitor(threading.Thread):
         logger.info("start monitoring openhab")
         while True:
             logger.info("restart monitoring")
+            logger.info("------")
             unknown_devices = self.openhab_api_manager.get_things()
+            logger.info("#######")
             logger.info(unknown_devices)
             if unknown_devices:
                 self._evaluate(unknown_devices)
