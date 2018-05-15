@@ -220,7 +220,13 @@ class Monitor(threading.Thread):
         # 3. Compare services
         if len(services) == 0:
             return (True, found_device_type_id)
-        elif len(device_types_with_same_name) == 0:
+        elif device_types_with_same_name["Exists"]:
+            return (True, device_types_with_same_name["Id"])
+        else:
+            return (False, None)
+        
+        """
+        elif not device_types_with_same_name["Exists"]:
             return (False, None)
         else:
             found_device_type_id = self.get_types_with_service([], services, 0)
@@ -238,6 +244,7 @@ class Monitor(threading.Thread):
             return (True, found_device_type_id)
         else:
             return (False, found_device_type_id)
+        """
 
     def get_platform_data_type(self, item_type, thing_is_sensor):
         """
