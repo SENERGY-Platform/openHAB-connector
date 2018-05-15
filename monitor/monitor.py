@@ -111,8 +111,8 @@ class Monitor(threading.Thread):
             "vendor":{  
                 "id":"iot#a9157959-8967-4d0e-8bfd-af079d821a3d",
             },
-            "name": device_type_informations.get("label", ""),
-            "description": device_type_informations.get("description", ""),
+            "name": device_type_informations.get("label", "no label"),
+            "description": device_type_informations.get("description", "no description"),
             "services": [],
             "config_parameter":[  
 
@@ -214,7 +214,6 @@ class Monitor(threading.Thread):
         services = device_type.get("services", [])
         found_device_type_id = False
         device_types_with_same_name = self.platform_api_manager.get_device_types_with_name(device_type_json_formatted)
-        logger.info(device_types_with_same_name)
         # 1. Check if device type has service, e.g Netatmo API has no services, as it is only the API but registered as device
         # 2. Check if there are device types with same name, if no, then create new device type, if yes, compare services
         # 3. Compare services
