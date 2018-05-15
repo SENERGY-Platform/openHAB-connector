@@ -36,7 +36,7 @@ class Monitor(threading.Thread):
         while True:
             logger.info("restart monitoring")
             unknown_devices = self.openhab_api_manager.get_things()
-            print(unknown_devices)
+            logger.info(unknown_devices)
             if unknown_devices:
                 self._evaluate(unknown_devices)
             time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
@@ -177,7 +177,7 @@ class Monitor(threading.Thread):
     def get_types_with_service(self, device_types, services, index):
         # Query all device types that have this one service
         response = self.platform_api_manager.get_device_types_with_service(json.dumps(services[index]))
-        print(response)
+        logger.info(response)
         if response:
             same_device_types = []
             if index == 0:
