@@ -65,9 +65,9 @@ class PlatformAPIManager(APIManager):
         logger.info("get device type on platform")
         return self.get("/deviceType/{id}".format(id=id), {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
     
-    def get_device_types_with_name(self, name):
+    def get_device_types_with_name(self, payload):
         logger.info("get device types with match on name")
-        return self.get("/ui/search/deviceTypes/{name}/20/0".format(name=name), {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
+        return self.post("/query/deviceType", payload, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
 
     def get_device_types_with_service(self, services):
         logger.info("get device types with match to provided services")
