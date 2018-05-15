@@ -210,9 +210,14 @@ class Monitor(threading.Thread):
         device_type = json.loads(device_type_json_formatted)
         services = device_type.get("services", [])
         found_device_type_id = False
+        device_types_with_same_name = self.platform_api_manager.get_device_types_with_name(device_type.get("name"))
+        # 1. Check if device type has service, e.g Netatmo API has no services, as it is only the API but registered as device
+        # 2. Check if there are device types with same name, if no, then create new device type, if yes, compare services
+        # 3. Compare services
         if len(services) == 0:
-            # Case: Device type with no service like Netatmo API -> is not important -> should not be on the platform
             return (True, found_device_type_id)
+        elif len(device_types_with_same_name) == 0:
+            return (False, None)
         else:
             found_device_type_id = self.get_types_with_service([], services, 0)
 
