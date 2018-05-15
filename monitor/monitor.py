@@ -35,11 +35,11 @@ class Monitor(threading.Thread):
         logger.info("start monitoring openhab")
         while True:
             logger.info("restart monitoring")
-            time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
             unknown_devices = self.openhab_api_manager.get_things()
             print(unknown_devices)
             if unknown_devices:
                 self._evaluate(unknown_devices)
+            time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
         
     def _evaluate(self, unknown_devices):   
         missing_devices, new_devices = self._diff(device_pool.DevicePool.devices(), unknown_devices)
@@ -73,13 +73,16 @@ class Monitor(threading.Thread):
                 logger.info("try to add new device")
                 device_type_json_formatted = self.get_device_type_json(device)
                 found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
-                logger.info("device type found on platform? " + str(found_on_platform))
+
+                logger.info("device type " + json.loads(device_type_json_formatted).get("name") + " found on platform? " + str(found_on_platform))
 
                 # if platform id exists then the device type was created already
                 if not found_on_platform:
                     device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
+                    logger.info("generated device type: " + str(device_type_patform_id))
+                else:
+                    logger.info("found device type: " + str(device_type_patform_id))
 
-                logger.info("device type: " + str(device_type_patform_id))
                 if device_type_patform_id:
                     formatted_device = self.format(device, device_type_patform_id)
                     client.Client.add(formatted_device)
@@ -110,75 +113,71 @@ class Monitor(threading.Thread):
             ]
         }
 
-        data_types = {}
+
         for channel in device.get("channels"):
             # Get platform data type with the device instance channel
             # not possible to get data type from device type channel
-            data_types[channel.get("channelTypeUID")] = {
-                "data_type": self.get_platform_data_type(channel.get("itemType"))
-            }
-
-        services = []
-        for channel in device_type_informations.get("channels"):
-            service = {
-                "name": channel.get("label", "no label"),
-                "desc": channel.get("description", "no description"),
-                "uri": channel.get("typeUID", "no uri")          
-            }
-
-            data_type = data_types.get(service.get("uri"))
-            if data_type:
-                service["data_type_id_platform"] = data_type.get("data_type")
-
-            services.append(service)
-
-        for service in services:        
-            # only if a matching data type was found the platform on , create the device type
-            if service.get("data_type_id_platform"):
-                # TODO if stateDescription.readOnly -> Sensorwert
-                device_type["services"].append(  
-                    {  
-                        "protocol":{  
-                            "id":"iot#d6a462c5-d4e0-4396-b3f3-28cd37b647a8"
-                        },
-                        "device_class": {
-                            "id": "iot#4bbe9a8d-de29-4073-8788-c0329472252b"
-                        },
-                        "output":[
-                         {  
-                            "type": {  
-                                "id": service.get("data_type_id_platform")
+            # distinguish between sensors and actuators, because they need different data types
+            # if item is read only -> thing is sensor
+            # also only add a channel as service type if it has a linked item which can be accessed to get data 
+            linked_items = channel.get("linkedItems")
+            if linked_items:
+                item = self.openhab_api_manager.get_item(linked_items[0])
+                thing_is_sensor = False
+                if item:
+                    state_desc = item.get("stateDescription") 
+                    if state_desc:
+                        thing_is_sensor = state_desc.get("readOnly")
+                
+                # only if a matching data type was found the platform on , create the device type
+                data_type = self.get_platform_data_type(channel.get("itemType"), thing_is_sensor)
+                if data_type:
+                    service = {  
+                            "protocol":{  
+                                "id": config["PLATFORM"]["protocol_id"]
                             },
-                            "msg_segment":{  
-                                "id":"iot#88cd5b0e-a451-4070-a20d-464ee23742dd"
+                            "device_class": {
+                                "id": config["PLATFORM"]["device_class_id"]
                             },
-                            "name":"ValueType",
-                            "format":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#json",
-                            "additional_formatinfo":[  
-                                {  
-                                    "field":{  
-                                        "id":"iot#7d4df496-0df0-4323-ba6b-0a0eaf90840d"
-                                    },
-                                    "format_flag":None
-                                }
-                            ]
-                            }
-                        ],
-                        "vendor": {
-                            "id": "iot#8f69bd7e-91a2-4949-b69d-477012b45574"
-                        },
-                        "name": service.get("name"),
-                        "description": service.get("desc"),
-                        "service_type":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#Sensor",
-                        "url": service.get("uri")
+                            "vendor": {
+                                "id": config["PLATFORM"]["vendor_id"]
+                            },
+                            "name": channel.get("label", "no label"),
+                            "description":  channel.get("description", "no description"),
+                            "service_type":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#Sensor",
+                            "url": channel.get("channelTypeUID", "no uri") 
+                        }
+                    
+                    parameter = {  
+                                "type": {  
+                                    "id": data_type
+                                },
+                                "msg_segment":{  
+                                    "id":"iot#88cd5b0e-a451-4070-a20d-464ee23742dd"
+                                },
+                                "name":"ValueType",
+                                "format":"http://www.sepl.wifa.uni-leipzig.de/ontlogies/device-repo#json",
+                                "additional_formatinfo":[  
+                                    {  
+                                        "field":{  
+                                            "id":"iot#7d4df496-0df0-4323-ba6b-0a0eaf90840d"
+                                        },
+                                        "format_flag":None
+                                    }
+                                ]
                     }
-                )
+                    if thing_is_sensor: 
+                        service["output"] = [parameter]
+                    else:
+                        service["input"] = [parameter]
+                    device_type["services"].append(service)
 
         return json.dumps(device_type)
 
     def get_types_with_service(self, device_types, services, index):
         # Query all device types that have this one service
         response = self.platform_api_manager.get_device_types_with_service(json.dumps(services[index]))
+        print(response)
         if response:
             same_device_types = []
             if index == 0:
@@ -229,24 +228,34 @@ class Monitor(threading.Thread):
         else:
             return (False, found_device_type_id)
 
-    def get_platform_data_type(self, item_type):
+    def get_platform_data_type(self, item_type, thing_is_sensor):
         """
         Map the item types from openhab with platform data types.
         """
 
-        type_map = {
-            "Number": config["PLATFORM"]["number_data_type"],
-            "Location": config["PLATFORM"]["string_data_type"],
-            "Switch": config["PLATFORM"]["string_data_type"],
-            "String": config["PLATFORM"]["string_data_type"]
-        }
+        if thing_is_sensor:
+            # Use data type that adds a timestamp {"value": value, "time": time}
+            type_map = {
+                "Number": config["PLATFORM"]["number_time_data_type"],
+                "Location": config["PLATFORM"]["string_time_data_type"],
+                "Switch": config["PLATFORM"]["string_time_data_type"],
+                "String": config["PLATFORM"]["string_time_data_type"]
+            }
+        else:
+            # Thing is an actuator -> use data type that matches the OpenHAB data type e.g plain string or number
+            type_map = {
+                "Number": config["PLATFORM"]["number_data_type"],
+                "Location": config["PLATFORM"]["string_data_type"],
+                "Switch": config["PLATFORM"]["string_data_type"],
+                "String": config["PLATFORM"]["string_data_type"]
+            }
 
         return type_map.get(item_type)
 
     def create_type_on_platform(self,device_type_json_formatted):
         logger.info("try to create new device type")
         response = self.platform_api_manager.create_type(device_type_json_formatted)
-        logger.info("created device type")
+        logger.info(response)
         device_type_id_on_platform = response.get("id")
         return device_type_id_on_platform 
 
