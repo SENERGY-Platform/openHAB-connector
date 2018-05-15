@@ -53,7 +53,10 @@ class Monitor(threading.Thread):
         if new_devices: 
             logger.info("Found " + str(len(new_devices)) + " new devices on OpenHAB")
             for device in new_devices:
-                self.add_device(device)
+                try:
+                    self.add_device(device)
+                except Exception as e:
+                    logger.info(e)
 
     def _diff(self, known, unknown):
         known_set = set(known.keys())
