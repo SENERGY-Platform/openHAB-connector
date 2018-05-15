@@ -211,6 +211,7 @@ class Monitor(threading.Thread):
         services = device_type.get("services", [])
         found_device_type_id = False
         device_types_with_same_name = self.platform_api_manager.get_device_types_with_name(device_type.get("name"))
+        logger.info(device_types_with_same_name)
         # 1. Check if device type has service, e.g Netatmo API has no services, as it is only the API but registered as device
         # 2. Check if there are device types with same name, if no, then create new device type, if yes, compare services
         # 3. Compare services
