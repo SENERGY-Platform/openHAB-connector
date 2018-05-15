@@ -40,9 +40,10 @@ class Observer(threading.Thread):
                         if items:
                             if len(items) != 0:
                                 service_response = self.openhab_api_manager.getItemState(items[0])
-                                service_response = float(service_response)
+                                # convert depending on data type
+                                if channel.get("itemType") == "Number":
+                                    service_response = float(service_response)
 
-                                # TODO convert to string / float
                                 payload = {
                                     "value": service_response,
                                     "time": datetime.datetime.now().isoformat()

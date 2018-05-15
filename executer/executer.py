@@ -26,7 +26,6 @@ class Executer(threading.Thread):
         payload = message.payload 
         thing_id = payload.get('device_url')
         channel_type_uid = payload.get('service_url')
-        linked_item_id = ""
         data = payload.get("protocol_parts")
         if data:
             data = data[0].get("value").strip()
