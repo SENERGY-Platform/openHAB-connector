@@ -41,7 +41,6 @@ class Monitor(threading.Thread):
             logger.info(unknown_devices)
             if unknown_devices:
                 self._evaluate(unknown_devices)
-            time.sleep(int(config["CONNECTOR"]["openhab_monitor_interval"]))
         
     def _evaluate(self, unknown_devices):   
         missing_devices, new_devices = self._diff(device_pool.DevicePool.devices(), unknown_devices)
