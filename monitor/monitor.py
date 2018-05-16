@@ -13,7 +13,7 @@ import os
 import logging
 from modules.logger import connector_client_log_handler
 
-logger = logging.getLogger("openhab_logger")
+logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
 logger.addHandler(connector_client_log_handler)
 
@@ -84,7 +84,7 @@ class Monitor(threading.Thread):
 
                 # if platform id exists then the device type was created already
                 if not found_on_platform:
-                    device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
+                    #device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
                     logger.info("generated device type: " + str(device_type_patform_id))
                 else:
                     logger.info("found device type: " + str(device_type_patform_id))
@@ -189,7 +189,6 @@ class Monitor(threading.Thread):
                 same_device_types = response
             else:
                 same_device_types = list(set(device_types) & set(response))
-            logger.info(same_device_types)
             length_same_device_types = len(same_device_types)
             if length_same_device_types == 0:
                 # Nothing found
@@ -212,27 +211,21 @@ class Monitor(threading.Thread):
 
         device_type = json.loads(device_type_json_formatted)
         services = device_type.get("services", [])
-        found_device_type_id = False
-        device_types_with_same_name = self.platform_api_manager.get_device_types_with_name(device_type_json_formatted)
+        device_types_with_same_name = self.platform_api_manager.get_device_types_with_name(json.dumps({"name": device_type.get("name")}))
         # 1. Check if device type has service, e.g Netatmo API has no services, as it is only the API but registered as device
-        # 2. Check if there are device types with same name, if no, then create new device type, if yes, compare services
+        # 2. Check if there are device types with same name, if no, then create new device type, if yes, compare services because there could be other type with same name but other services
         # 3. Compare services
         if len(services) == 0:
-            return (True, found_device_type_id)
+            return (True, None)
+        elif not device_types_with_same_name["Exists"]:
+            return (False, None)
         elif device_types_with_same_name["Exists"]:
             return (True, device_types_with_same_name["Id"])
         else:
-            return (False, None)
-        """
-        elif not device_types_with_same_name["Exists"]:
-            return (False, None)
-        else:
             found_device_type_id = self.get_types_with_service([], services, 0)
 
-        
         if found_device_type_id:
             # check if keys from my generated device type have the same value as the one from the platform
-            # todo
             found_device_type_object = self.platform_api_manager.get_device_type(parse.quote_plus(found_device_type_id))
             # last check for general proerperties of device type like name
             check_properties = ["name", "description"]
@@ -242,8 +235,7 @@ class Monitor(threading.Thread):
 
             return (True, found_device_type_id)
         else:
-            return (False, found_device_type_id)
-        """
+            return (False, None)
 
     def get_platform_data_type(self, item_type, thing_is_sensor):
         """

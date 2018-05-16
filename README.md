@@ -367,7 +367,8 @@ UpDownType	UP, DOWN
 - some channels are not linked by default (missing dot)
 
 - if the value type ids have changed, you have to change them in the config.ini file
-
+- services = channels problem, openhab channels can be accessed with multiple data types e.g string and numbers 
+- platform services only have one datatype
 
 # TODO
 - leerzeichen entfernen bei service name, service id ...
