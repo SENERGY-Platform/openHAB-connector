@@ -22,20 +22,20 @@ class Observer(threading.Thread):
             time.sleep(int(config["CONNECTOR"]["ping_interval"]))
             logger.debug("get values from devices and push to platform")
             connected_devices = device_pool.DevicePool.devices()
-            try:
-                for device in connected_devices:
-                    device_json = self.openhab_api_manager.get_thing(device)
 
-                    channels = device_json.get("channels")
-                    for channel in channels:
-                        items = channel.get("linkedItems")
-                        if items:
-                            if len(items) != 0:
+            for device in connected_devices:
+                device_json = self.openhab_api_manager.get_thing(device)
+
+                channels = device_json.get("channels")
+                for channel in channels:
+                    items = channel.get("linkedItems")
+                    if items:
+                        if len(items) != 0:
+                            try:
                                 service_response = self.openhab_api_manager.getItemState(items[0])
                                 # convert depending on data type
                                 if channel.get("itemType") == "Number":
                                     service_response = float(service_response)
-
                                 payload = {
                                     "value": service_response,
                                     "time": datetime.datetime.utcnow().isoformat()
@@ -45,5 +45,5 @@ class Observer(threading.Thread):
                                 logger.debug("publish data: " + json.dumps(payload))
                                 response = Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
                                 logger.debug(response.status)
-            except Exception as e:
-                logger.error(e)
+                            except Exception as ex:
+                                logger.error("'{}': {}".format(items[0], ex))
