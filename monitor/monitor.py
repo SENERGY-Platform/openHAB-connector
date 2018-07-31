@@ -40,10 +40,10 @@ class Monitor(threading.Thread):
             logger.info(str(len(new_devices)) + " devices were deleted on OpenHAB")
             for device in missing_devices:
                 Client.delete(device)
-        if new_devices: 
-            logger.info("Found " + str(len(new_devices)) + " new devices on OpenHAB")
+        if new_devices:
             for device in new_devices:
                 try:
+                    logger.info("Found device: '{}'".format(device.get("label")))
                     self.add_device(device)
                 except Exception as e:
                     logger.error(e)
@@ -66,7 +66,7 @@ class Monitor(threading.Thread):
         status = device.get("statusInfo")
         if status:
             if status.get("status") == "ONLINE":
-                logger.info("try to add new device")
+                logger.info("'{}' is online trying to add ...".format(device.get("label")))
                 device_type_json_formatted = self.get_device_type_json(device)
                 found_on_platform, device_type_patform_id = self.get_platform_id(device_type_json_formatted)
 
@@ -83,6 +83,8 @@ class Monitor(threading.Thread):
                     formatted_device = self.format(device, device_type_patform_id)
                     Client.add(formatted_device)
                     logger.info("added new device")
+            else:
+                logger.info("'{}' is offline - no further action".format(device.get("label")))
 
     def format(self,device,device_type_id_on_platform):
         device_name = device.get("label")
