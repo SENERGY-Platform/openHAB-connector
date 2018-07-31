@@ -1,14 +1,8 @@
-import threading
-import time
-from connector import device, client
-import json
-from modules import device_pool
+import threading, time, json, datetime, configparser, os, logging
+from connector_client.client import Client
+from connector_client.modules import device_pool
 from api_manager import api_manager
-import datetime
-import configparser
-import os
-import logging
-from modules.logger import connector_client_log_handler
+from connector_client.modules.logger import connector_client_log_handler
 
 logger = logging.getLogger("openhab_logger")
 logger.setLevel(logging.DEBUG) 
@@ -46,12 +40,12 @@ class Observer(threading.Thread):
 
                                 payload = {
                                     "value": service_response,
-                                    "time": datetime.datetime.now().isoformat()
+                                    "time": datetime.datetime.utcnow().isoformat()
                                 }
                                 # channel type uid == service id
                                 logger.info("try to publish data from service: " + channel.get("channelTypeUID"))
                                 logger.info("publish data: " + json.dumps(payload))
-                                response = client.Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
+                                response = Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
                                 logger.info(response.status)
             except Exception as e:
                 logger.info(e)
