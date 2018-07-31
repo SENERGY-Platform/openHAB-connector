@@ -25,7 +25,6 @@ class Monitor(threading.Thread):
     def run(self):
         logger.info("start monitoring openhab")
         while True:
-            logger.info("restart monitoring")
             unknown_devices = None
             try:
                 unknown_devices = self.openhab_api_manager.get_things()
@@ -47,7 +46,7 @@ class Monitor(threading.Thread):
                 try:
                     self.add_device(device)
                 except Exception as e:
-                    logger.info(e)
+                    logger.error(e)
 
     def _diff(self, known, unknown):
         known_set = set(known.keys())

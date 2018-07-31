@@ -11,8 +11,10 @@ class Executer(threading.Thread):
         self.openhab_api_manager = api_manager.OpenhabAPIManager()
 
     def run(self):
+        logger.info("starting executor ...")
         while True:
             message = Client.receive()
+            logger.debug(message)
             response = self.get_command(message)
             Client.response(message, response, metadata=None, timeout=10, callback=None, block=True)
 

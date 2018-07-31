@@ -20,7 +20,7 @@ class Observer(threading.Thread):
         logger.info("Start observing of values")
         while True:
             time.sleep(int(config["CONNECTOR"]["ping_interval"]))
-            logger.info("get values from devices and push to platform")
+            logger.debug("get values from devices and push to platform")
             connected_devices = device_pool.DevicePool.devices()
             try:
                 for device in connected_devices:
@@ -41,9 +41,9 @@ class Observer(threading.Thread):
                                     "time": datetime.datetime.utcnow().isoformat()
                                 }
                                 # channel type uid == service id
-                                logger.info("try to publish data from service: " + channel.get("channelTypeUID"))
-                                logger.info("publish data: " + json.dumps(payload))
+                                logger.debug("try to publish data from service: " + channel.get("channelTypeUID"))
+                                logger.debug("publish data: " + json.dumps(payload))
                                 response = Client.event(device, channel.get("channelTypeUID"), json.dumps(payload))
-                                logger.info(response.status)
+                                logger.debug(response.status)
             except Exception as e:
-                logger.info(e)
+                logger.error(e)
