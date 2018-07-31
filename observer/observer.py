@@ -2,11 +2,9 @@ import threading, time, json, datetime, configparser, os, logging
 from connector_client.client import Client
 from connector_client.modules import device_pool
 from api_manager import api_manager
-from connector_client.modules.logger import connector_client_log_handler
+from logger.logger import root_logger
 
-logger = logging.getLogger("openhab_logger")
-logger.setLevel(logging.DEBUG) 
-logger.addHandler(connector_client_log_handler)
+logger = root_logger.getChild('observer')
 
 dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')

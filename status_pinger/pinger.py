@@ -3,7 +3,7 @@ import threading, time, configparser, os, logging
 from api_manager import api_manager
 from connector_client.modules import device_pool
 from connector_client.client import Client
-from connector_client.modules.logger import connector_client_log_handler
+from logger.logger import root_logger
 
 
 dir = os.path.dirname(__file__)
@@ -11,9 +11,7 @@ filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
 
-logger = logging.getLogger("openhab_logger")
-logger.setLevel(logging.DEBUG) 
-logger.addHandler(connector_client_log_handler)
+logger = root_logger.getChild('pinger')
 
 class Pinger(threading.Thread):
     def __init__(self):

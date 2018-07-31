@@ -4,11 +4,9 @@ from connector_client import device as device_file
 from connector_client.modules import device_pool
 from connector_client.client import Client
 from api_manager import api_manager
-from connector_client.modules.logger import connector_client_log_handler
+from logger.logger import root_logger
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG) 
-logger.addHandler(connector_client_log_handler)
+logger = root_logger.getChild('monitor')
 
 
 dir = os.path.dirname(__file__)
