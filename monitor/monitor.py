@@ -73,11 +73,11 @@ class Monitor(threading.Thread):
                 logger.info("device type " + json.loads(device_type_json_formatted).get("name") + " found on platform? " + str(found_on_platform))
 
                 # if platform id exists then the device type was created already
-                if not found_on_platform:
-                    #device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
-                    logger.info("generated device type: " + str(device_type_patform_id))
-                else:
+                if found_on_platform:
                     logger.info("found device type: " + str(device_type_patform_id))
+                else:
+                    # device_type_patform_id = self.create_type_on_platform(device_type_json_formatted)
+                    logger.info("generated device type: " + str(device_type_patform_id))
 
                 if device_type_patform_id:
                     formatted_device = self.format(device, device_type_patform_id)
