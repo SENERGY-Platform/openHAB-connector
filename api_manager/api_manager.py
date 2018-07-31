@@ -1,21 +1,19 @@
-import requests, configparser, os, logging
-from connector_client.modules.logger import connector_client_log_handler
+import requests, configparser, os
+from logger.logger import root_logger
 
 dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
 
-logger = logging.getLogger("openhab_logger")
-logger.setLevel(logging.DEBUG) 
-logger.addHandler(connector_client_log_handler)
+logger = root_logger.getChild('api_manager')
 
 class APIManager():
     def __init__(self, ip, port, base_path="", scheme="http"):
         self.ip = ip 
         self.port = port 
         self.base_path = base_path
-        self.scheme = scheme 
+        self.scheme = scheme
     
     def get(self, path, headers=None):
         response = requests.get("{scheme}://{ip}:{port}{base_path}{path}".format(scheme=self.scheme,ip=self.ip, port=self.port,base_path=self.base_path,path=path), headers=headers)
@@ -31,23 +29,23 @@ class OpenhabAPIManager(APIManager):
         super().__init__(config["OPENHAB"]["host"], config["OPENHAB"]["port"])
 
     def get_thing_type(self,type_id):
-        logger.info("get thing type from OpenHAB")
+        logger.debug("get thing type from OpenHAB")
         return self.get("/rest/thing-types/{id}".format(id=type_id)).json()
         
     def get_things(self):
-        logger.info("get things from OpenHAB")
+        logger.debug("get things from OpenHAB")
         return self.get("/rest/things").json()
 
     def get_item(self,item):
-        logger.info("get item from OpenHAB")
+        logger.debug("get item from OpenHAB")
         return self.get("/rest/items/{item}".format(item=item)).json()
 
     def getItemState(self,item):
-        logger.info("get item state from OpenHAB")
+        logger.debug("get item state from OpenHAB")
         return self.get("/rest/items/{item}/state".format(item=item)).text
 
     def get_thing(self, device_id):
-        logger.info("get thing from OpenHAB")
+        logger.debug("get thing from OpenHAB")
         return self.get("/rest/things/{device_id}".format(device_id=device_id)).json()
 
 class PlatformAPIManager(APIManager):
@@ -56,19 +54,19 @@ class PlatformAPIManager(APIManager):
         self.keycloak_manager = KeycloakAPIManager()
 
     def create_type(self,payload):
-        logger.info("create device type on platform")
+        logger.debug("create device type on platform")
         return self.post("/deviceType", payload, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
 
     def get_device_type(self,id):
-        logger.info("get device type on platform")
+        logger.debug("get device type on platform")
         return self.get("/deviceType/{id}".format(id=id), {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
     
     def get_device_types_with_name(self, payload):
-        logger.info("get device types with match on name")
+        logger.debug("get device types with match on name")
         return self.post("/query/deviceType", payload, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
 
     def get_device_types_with_service(self, services):
-        logger.info("get device types with match to provided services")
+        logger.debug("get device types with match to provided services")
         return self.post("/query/service", services, {"Authorization": "Bearer " + self.keycloak_manager.get_access_token()}).json()
 
 class KeycloakAPIManager(APIManager):
