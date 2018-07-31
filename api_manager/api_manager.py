@@ -1,12 +1,10 @@
-import requests 
-import configparser
-import os
+import requests, configparser, os, logging
+from connector_client.modules.logger import connector_client_log_handler
+
 dir = os.path.dirname(__file__)
 filename = os.path.join(dir, '../config.ini')
 config = configparser.ConfigParser()
 config.read(filename)
-import logging
-from modules.logger import connector_client_log_handler
 
 logger = logging.getLogger("openhab_logger")
 logger.setLevel(logging.DEBUG) 

@@ -1,10 +1,5 @@
-import os, sys, inspect
-import_path = os.path.realpath(os.path.abspath(os.path.join(os.path.split(inspect.getfile(inspect.currentframe()))[0],"connector-client")))
-if import_path not in sys.path:
-    sys.path.insert(0, import_path)
-
-from connector.client import Client
-from modules.device_pool import DevicePool
+from connector_client.client import Client
+from connector_client.modules.device_pool import DevicePool
 
 from monitor import monitor
 from observer import observer
@@ -14,7 +9,7 @@ import logging
 
 if __name__ == "__main__":
     logging.getLogger("urllib3").setLevel(logging.WARNING)
-    connector_client = Client(device_manager=DevicePool) 
+    connector_client = Client(device_manager=DevicePool)
     
     monitor_openhab = monitor.Monitor()
     monitor_openhab.start()

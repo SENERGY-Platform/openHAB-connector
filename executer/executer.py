@@ -1,9 +1,7 @@
-import threading
-from connector import client
+import threading, requests,logging
+from connector_client.client import Client
 from api_manager import api_manager
-import requests
-import logging
-from modules.logger import connector_client_log_handler
+from connector_client.modules.logger import connector_client_log_handler
 
 logger = logging.getLogger("openhab_logger")
 logger.setLevel(logging.DEBUG) 
@@ -17,9 +15,9 @@ class Executer(threading.Thread):
     def run(self):
         while True:
             print("executer listens for commands")
-            message = client.Client.receive()
+            message = Client.receive()
             response = self.get_command(message)
-            client.Client.response(message, response, metadata=None, timeout=10, callback=None, block=True)
+            Client.response(message, response, metadata=None, timeout=10, callback=None, block=True)
 
     def get_command(self,message):
         print("Got command from platform")

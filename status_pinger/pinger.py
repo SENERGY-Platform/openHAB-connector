@@ -1,13 +1,9 @@
 # /things mit ids aus device ppool status checken 
+import threading, time, configparser, os, logging
 from api_manager import api_manager
-import threading
-from modules import device_pool
-import time 
-from connector import client
-import configparser
-import os 
-import logging
-from modules.logger import connector_client_log_handler
+from connector_client.modules import device_pool
+from connector_client.client import Client
+from connector_client.modules.logger import connector_client_log_handler
 
 
 dir = os.path.dirname(__file__)
@@ -38,8 +34,8 @@ class Pinger(threading.Thread):
         status = response.get("statusInfo")
         if status:
             if status.get("status") == "OFFLINE":
-                client.Client.disconnect(device_id)
+                Client.disconnect(device_id)
             elif status == "ONLINE":
                 device = device_pool.DevicePool.get(device_id)
-                client.Client.add(device)
+                Client.add(device)
 

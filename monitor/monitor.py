@@ -1,17 +1,10 @@
-import threading
-import requests 
-import time 
-import json 
+import threading, time, json, configparser, os, logging
 from urllib import parse
-from connector import device as device_file
-from modules import singleton
-from modules import device_pool
-from connector import client
+from connector_client import device as device_file
+from connector_client.modules import device_pool
+from connector_client.client import Client
 from api_manager import api_manager
-import configparser
-import os 
-import logging
-from modules.logger import connector_client_log_handler
+from connector_client.modules.logger import connector_client_log_handler
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG) 
@@ -49,7 +42,7 @@ class Monitor(threading.Thread):
         if missing_devices:
             logger.info(str(len(new_devices)) + " devices were deleted on OpenHAB")
             for device in missing_devices:
-                client.Client.delete(device)
+                Client.delete(device)
         if new_devices: 
             logger.info("Found " + str(len(new_devices)) + " new devices on OpenHAB")
             for device in new_devices:
@@ -91,7 +84,7 @@ class Monitor(threading.Thread):
 
                 if device_type_patform_id:
                     formatted_device = self.format(device, device_type_patform_id)
-                    client.Client.add(formatted_device)
+                    Client.add(formatted_device)
                     logger.info("added new device")
 
     def format(self,device,device_type_id_on_platform):
